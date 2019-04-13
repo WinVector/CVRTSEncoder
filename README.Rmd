@@ -1,0 +1,60 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+
+```{r, echo = FALSE, warning=FALSE, message=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = " # ",
+  fig.path = "tools/README-"
+)
+```
+
+
+[`CVRTSEncoder`](https://github.com/WinVector/CVRTSEncoder) is a categorical variable encoding for supervised learning.
+
+Re-encode a set of categorical variables jointly as a spectral projection of the trajectory of modeling residuals.  This is intended as a succinct numeric linear representation of a set of categorical variables in a manner that is useful for supervised learning.
+
+The concept is y-aware encoding the trajectory of non-linear model residuals in terms of target categorical variables.
+
+The idea is an extension of the [`vtreat`](https://github.com/WinVector/vtreat) coding [concepts](https://github.com/WinVector/vtreat/blob/master/extras/vtreat.pdf) and of the y-aware scaling concepts of Nina Zumel and John Mount:
+
+  * [Principal Components Regression, Pt.1: The Standard Method](http://www.win-vector.com/blog/2016/05/pcr_part1_xonly/)
+  * [Principal Components Regression, Pt. 2: Y-Aware Methods](http://www.win-vector.com/blog/2016/05/pcr_part2_yaware/)
+  * [Principal Components Regression, Pt. 3: Picking the Number of Components](http://www.win-vector.com/blog/2016/05/pcr_part3_pickk/)
+  * [y-aware scaling in context](http://www.win-vector.com/blog/2016/06/y-aware-scaling-in-context/).
+
+```{r example}
+library("CVRTSEncoder")
+
+data <- iris
+avars <- c("Sepal.Length", "Petal.Length")
+evars <- c("Sepal.Width", "Petal.Width")
+dep_var <- "Species"
+dep_target <- "versicolor"
+for(vi in evars) {
+  data[[vi]] <- as.character(round(data[[vi]]))
+}
+cross_enc <- estimate_residual_encoding_c(
+  data = data,
+  avars = avars,
+  evars = evars,
+  fit_predict = xgboost_fit_predict_c,
+  dep_var = dep_var,
+  dep_target = dep_target,
+  n_comp = 4
+)
+enc <- prepare(cross_enc$coder, data)
+data <- cbind(data, enc)
+newvars <- c(avars, colnames(enc))
+f <- wrapr::mk_formula(dep_var, newvars, outcome_target = dep_target)
+model <- glm(f, data = data, family = binomial)
+summary(model)
+
+data$pred <- predict(model, newdata = data, type = "response")
+table(data$Species, data$pred>0.5)
+```
+
