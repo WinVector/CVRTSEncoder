@@ -16,7 +16,8 @@ library('WVPlots')
 library('CVRTSEncoder')
 library('sigr')
 library('parallel')
-library('xgboost')
+library("glmnet")
+
 
 dir = "../../PDSwR2/KDD2009/"
 
@@ -57,7 +58,125 @@ yTarget <- 1
 date()
 ```
 
+
+
+```{r kddvarsel_a}
+date()
+
+var_values <- vtreat::value_variables_C(dTrain,
+    vars,yName,yTarget,
+    smFactor=2.0, 
+    parallelCluster=cl
+    )
+summary(var_values$sig < 1/nrow(var_values))
+
+length(vars)
+vars <- var_values$var[var_values$sig < 1/nrow(var_values)]
+length(vars)
+
+date()
+```
+
+
+```{r kddtreat_a, tidy=FALSE}
+date()
+
+# Run other models (with proper coding/training separation).
+#
+# This gets us back to AUC 0.74 range
+
+customCoders = list('c.PiecewiseV.num' = vtreat::solve_piecewise,
+                    'n.PiecewiseV.num' = vtreat::solve_piecewise,
+                    'c.knearest.num' = vtreat::square_window,
+                    'n.knearest.num' = vtreat::square_window)
+cfe = mkCrossFrameCExperiment(dTrain,
+                              vars,yName,yTarget,
+                              customCoders=customCoders,
+                              smFactor=2.0, 
+                              parallelCluster=cl)
+
+
+treatmentsC = cfe$treatments
+scoreFrame = treatmentsC$scoreFrame
+table(scoreFrame$code)
+selvars <- scoreFrame$varName
+treatedTrainM <- cfe$crossFrame[,c(yName,selvars),drop=FALSE]
+treatedTrainM[[yName]] = treatedTrainM[[yName]]==yTarget
+
+treatedTest = prepare(treatmentsC,
+                      dTest,
+                      pruneSig=NULL, 
+                      varRestriction = selvars,
+                      parallelCluster=cl)
+treatedTest[[yName]] = treatedTest[[yName]]==yTarget
+
+# prepare plotting frames
+treatedTrainP = treatedTrainM[, yName, drop=FALSE]
+treatedTestP = treatedTest[, yName, drop=FALSE]
+date()
+```
+
+
+```{r kddmodels_a, tidy=FALSE}
+date()
+mname = 'glmnet_pred'
+print(paste(mname,length(selvars)))
+
+model <- cv.glmnet(as.matrix(treatedTrainM[, selvars, drop = FALSE]),
+                   treatedTrainM[[yName]]==yTarget,
+                   family = "binomial")
+treatedTrainP[[mname]] = as.numeric(predict(
+  model, 
+  newx = as.matrix(treatedTrainM[, selvars, drop = FALSE]),
+  type = 'response',
+  s = "lambda.min"))
+treatedTestP[[mname]] = as.numeric(predict(
+  model,
+  newx = as.matrix(treatedTest[, selvars, drop = FALSE]),
+  type = 'response',
+  s = "lambda.min"))
+date()
+```
+
+```{r score_a}
+calcAUC(treatedTestP[[mname]], treatedTestP[[yName]]==yTarget)
+
+permTestAUC(treatedTestP, mname, yName, yTarget = yTarget)
+
+wrapChiSqTest(treatedTestP, mname, yName, yTarget = yTarget)
+```
+
+```{r kddplot_a, tidy=FALSE}
+date()
+
+
+t1 = paste(mname,'trainingM data')
+print(DoubleDensityPlot(treatedTrainP, mname, yName, 
+                        title=t1))
+print(ROCPlot(treatedTrainP, mname, yName, yTarget,
+              title=t1))
+print(WVPlots::PRPlot(treatedTrainP, mname, yName, yTarget,
+              title=t1))
+
+t2 = paste(mname,'test data')
+print(DoubleDensityPlot(treatedTestP, mname, yName, 
+                        title=t2))
+print(ROCPlot(treatedTestP, mname, yName, yTarget,
+              title=t2))
+print(WVPlots::PRPlot(treatedTestP, mname, yName, yTarget,
+              title=t2))
+
+print(date())
+print("*****************************")
+date()
+```
+
+
+
+
+
 ```{r kddencodecats}
+# enrich with CVRRS encoded variables
 date()
 
 # encode as in https://github.com/WinVector/CVRTSEncoder
@@ -86,6 +205,7 @@ dTest <- cbind(dTest,prepare(cross_enc$coder, dTest))
 
 date()
 ```
+
 
 ```{r kddvarsel}
 date()
@@ -143,35 +263,25 @@ treatedTestP = treatedTest[, yName, drop=FALSE]
 date()
 ```
 
-# TODO: try glmnet here
 
 ```{r kddmodels, tidy=FALSE}
 date()
-mname = 'xgbPred'
+mname = 'glmnet_pred_CVRTS'
 print(paste(mname,length(selvars)))
 
-params <- list(max_depth = 5, 
-              objective = "binary:logistic",
-              nthread = ncore)
-model <- xgb.cv(data = as.matrix(treatedTrainM[, selvars, drop = FALSE]),
-                label = treatedTrainM[[yName]],
-                nrounds = 400,
-                params = params,
-                nfold = 5,
-                early_stopping_rounds = 10,
-                eval_metric = "logloss")
-nrounds <- model$best_iteration
-print(paste("nrounds", nrounds))
-model <- xgboost(data = as.matrix(treatedTrainM[, selvars, drop = FALSE]),
-                 label = treatedTrainM[[yName]],
-                 nrounds = nrounds,
-                 params = params)
-treatedTrainP[[mname]] = predict(model, 
-                                 newdata=as.matrix(treatedTrainM[, selvars, drop = FALSE]), 
-                                 type='response')
-treatedTestP[[mname]] = predict(model,
-                                newdata=as.matrix(treatedTest[, selvars, drop = FALSE]), 
-                                n.trees=nTrees)
+model <- cv.glmnet(as.matrix(treatedTrainM[, selvars, drop = FALSE]),
+                   treatedTrainM[[yName]]==yTarget,
+                   family = "binomial")
+treatedTrainP[[mname]] = as.numeric(predict(
+  model, 
+  newx = as.matrix(treatedTrainM[, selvars, drop = FALSE]),
+  type = 'response',
+  s = "lambda.min"))
+treatedTestP[[mname]] = as.numeric(predict(
+  model,
+  newx = as.matrix(treatedTest[, selvars, drop = FALSE]),
+  type = 'response',
+  s = "lambda.min"))
 date()
 ```
 
