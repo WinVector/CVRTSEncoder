@@ -50,6 +50,42 @@ cross_enc <- estimate_residual_encoding_c(
 )
 enc <- prepare(cross_enc$coder, data)
 data <- cbind(data, enc)
+
+f0 <- wrapr::mk_formula(dep_var, avars, outcome_target = dep_target)
+model0 <- glm(f0, data = data, family = binomial)
+summary(model0)
+ #  
+ #  Call:
+ #  glm(formula = f0, family = binomial, data = data)
+ #  
+ #  Deviance Residuals: 
+ #      Min       1Q   Median       3Q      Max  
+ #  -1.5493  -0.9437  -0.6451   1.2645   1.7894  
+ #  
+ #  Coefficients:
+ #               Estimate Std. Error z value Pr(>|z|)   
+ #  (Intercept)    3.0440     1.9752   1.541  0.12328   
+ #  Sepal.Length  -1.1262     0.4611  -2.443  0.01459 * 
+ #  Petal.Length   0.7369     0.2282   3.229  0.00124 **
+ #  ---
+ #  Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+ #  
+ #  (Dispersion parameter for binomial family taken to be 1)
+ #  
+ #      Null deviance: 190.95  on 149  degrees of freedom
+ #  Residual deviance: 178.32  on 147  degrees of freedom
+ #  AIC: 184.32
+ #  
+ #  Number of Fisher Scoring iterations: 4
+
+data$pred0 <- predict(model0, newdata = data, type = "response")
+table(data$Species, data$pred0>0.5)
+ #              
+ #               FALSE TRUE
+ #    setosa        50    0
+ #    versicolor    45    5
+ #    virginica     38   12
+
 newvars <- c(avars, colnames(enc))
 f <- wrapr::mk_formula(dep_var, newvars, outcome_target = dep_target)
 model <- glm(f, data = data, family = binomial)
@@ -65,13 +101,13 @@ summary(model)
  #  
  #  Coefficients:
  #                 Estimate Std. Error z value Pr(>|z|)   
- #  (Intercept)  -3.336e+00  2.237e+06   0.000  1.00000   
+ #  (Intercept)  -3.335e+00  2.237e+06   0.000  1.00000   
  #  Sepal.Length  3.507e+00  1.665e+00   2.106  0.03517 * 
  #  Petal.Length -1.170e+01  3.770e+00  -3.103  0.00191 **
- #  c_001         8.219e+01  2.475e+06   0.000  0.99997   
- #  c_002         2.931e+02  3.002e+07   0.000  0.99999   
- #  c_003        -3.916e+00  5.280e+05   0.000  0.99999   
- #  c_004         5.871e+02  2.437e+06   0.000  0.99981   
+ #  c_001         8.036e+01  4.441e+06   0.000  0.99999   
+ #  c_002        -2.241e+02  2.519e+07   0.000  0.99999   
+ #  c_003        -8.680e+02  2.250e+07   0.000  0.99997   
+ #  c_004         4.461e+02  2.399e+07   0.000  0.99999   
  #  ---
  #  Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
  #  

@@ -49,6 +49,14 @@ cross_enc <- estimate_residual_encoding_c(
 )
 enc <- prepare(cross_enc$coder, data)
 data <- cbind(data, enc)
+
+f0 <- wrapr::mk_formula(dep_var, avars, outcome_target = dep_target)
+model0 <- glm(f0, data = data, family = binomial)
+summary(model0)
+
+data$pred0 <- predict(model0, newdata = data, type = "response")
+table(data$Species, data$pred0>0.5)
+
 newvars <- c(avars, colnames(enc))
 f <- wrapr::mk_formula(dep_var, newvars, outcome_target = dep_target)
 model <- glm(f, data = data, family = binomial)
