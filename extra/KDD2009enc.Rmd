@@ -1,0 +1,217 @@
+---
+title: "KDD2009vtreat"
+author: "John Mount"
+output: github_document
+---
+
+
+KDD2009 example using the `vtreat` `R` package.
+
+
+```{r kddexlibs, tidy=FALSE}
+date()
+#load some libraries
+library('vtreat')
+library('WVPlots') 
+library('CVRTSEncoder')
+library('sigr')
+library('parallel')
+library('xgboost')
+
+dir = "../../PDSwR2/KDD2009/"
+
+
+d <- read.table(paste(dir, 'orange_small_train.data.gz', sep = "/"), 
+   header = TRUE,
+   sep = '\t',
+   na.strings = c('NA', '')) 
+                                                
+churn <- read.table(paste(dir, 'orange_small_train_churn.labels.txt', sep = "/"),
+   header = FALSE, sep = '\t') 	
+d$churn <- churn$V1 
+
+set.seed(729375) 
+rgroup <- base::sample(c('train', 'calibrate', 'test'), 	 
+   nrow(d), 
+   prob = c(0.8, 0.1, 0.1),
+   replace = TRUE)
+dTrain <- d[rgroup=='train', , drop = FALSE]
+dCal <- d[rgroup=='calibrate', , drop = FALSE]
+dTrainAll <- d[rgroup %in% c('train', 'calibrate'), , drop = FALSE]
+dTest <- d[rgroup == 'test', , drop = FALSE]
+                                                
+outcome <- 'churn' 
+vars <- setdiff(colnames(dTrainAll), outcome)
+
+                                                
+rm(list=c('d', 'churn', 'rgroup')) 	
+
+set.seed(239525)
+
+ncore <- parallel::detectCores()
+(cl = parallel::makeCluster(ncore))
+
+yName <- "churn"
+yTarget <- 1
+
+date()
+```
+
+```{r kddencodecats}
+date()
+
+# encode as in https://github.com/WinVector/CVRTSEncoder
+
+categorical_cols <- vapply(
+  vars,
+  function(ci) {
+    is.character(dTrain[[ci]]) || is.factor(dTrain[[ci]])
+  }, logical(1))
+categorical_cols <- vars[categorical_cols]
+
+cross_enc <- estimate_residual_encoding_c(
+  data = dTrain,
+  avars = setdiff(vars, categorical_cols),
+  evars = categorical_cols,
+  fit_predict = xgboost_fit_predict_c,
+  dep_var = yName,
+  dep_target = yTarget,
+  n_comp = 20,
+  cl = cl
+)
+te_vars <- colnames(cross_enc$cross_frame)
+vars <- c(vars, te_vars)
+dTrain <- cbind(dTrain, cross_enc$cross_frame)
+dTest <- cbind(dTest,prepare(cross_enc$coder, dTest))
+
+date()
+```
+
+```{r kddvarsel}
+date()
+
+var_values <- vtreat::value_variables_C(dTrain,
+    vars,yName,yTarget,
+    smFactor=2.0, 
+    parallelCluster=cl
+    )
+summary(var_values$sig < 1/nrow(var_values))
+
+length(vars)
+vars <- var_values$var[var_values$sig < 1/nrow(var_values)]
+length(vars)
+
+date()
+```
+
+
+```{r kddtreat, tidy=FALSE}
+date()
+
+# Run other models (with proper coding/training separation).
+#
+# This gets us back to AUC 0.74 range
+
+customCoders = list('c.PiecewiseV.num' = vtreat::solve_piecewise,
+                    'n.PiecewiseV.num' = vtreat::solve_piecewise,
+                    'c.knearest.num' = vtreat::square_window,
+                    'n.knearest.num' = vtreat::square_window)
+cfe = mkCrossFrameCExperiment(dTrain,
+                              vars,yName,yTarget,
+                              customCoders=customCoders,
+                              smFactor=2.0, 
+                              parallelCluster=cl)
+
+
+treatmentsC = cfe$treatments
+scoreFrame = treatmentsC$scoreFrame
+table(scoreFrame$code)
+selvars <- scoreFrame$varName
+treatedTrainM <- cfe$crossFrame[,c(yName,selvars),drop=FALSE]
+treatedTrainM[[yName]] = treatedTrainM[[yName]]==yTarget
+
+treatedTest = prepare(treatmentsC,
+                      dTest,
+                      pruneSig=NULL, 
+                      varRestriction = selvars,
+                      parallelCluster=cl)
+treatedTest[[yName]] = treatedTest[[yName]]==yTarget
+
+# prepare plotting frames
+treatedTrainP = treatedTrainM[, yName, drop=FALSE]
+treatedTestP = treatedTest[, yName, drop=FALSE]
+date()
+```
+
+# TODO: try glmnet here
+
+```{r kddmodels, tidy=FALSE}
+date()
+mname = 'xgbPred'
+print(paste(mname,length(selvars)))
+
+params <- list(max_depth = 5, 
+              objective = "binary:logistic",
+              nthread = ncore)
+model <- xgb.cv(data = as.matrix(treatedTrainM[, selvars, drop = FALSE]),
+                label = treatedTrainM[[yName]],
+                nrounds = 400,
+                params = params,
+                nfold = 5,
+                early_stopping_rounds = 10,
+                eval_metric = "logloss")
+nrounds <- model$best_iteration
+print(paste("nrounds", nrounds))
+model <- xgboost(data = as.matrix(treatedTrainM[, selvars, drop = FALSE]),
+                 label = treatedTrainM[[yName]],
+                 nrounds = nrounds,
+                 params = params)
+treatedTrainP[[mname]] = predict(model, 
+                                 newdata=as.matrix(treatedTrainM[, selvars, drop = FALSE]), 
+                                 type='response')
+treatedTestP[[mname]] = predict(model,
+                                newdata=as.matrix(treatedTest[, selvars, drop = FALSE]), 
+                                n.trees=nTrees)
+date()
+```
+
+```{r score}
+calcAUC(treatedTestP[[mname]], treatedTestP[[yName]]==yTarget)
+
+permTestAUC(treatedTestP, mname, yName, yTarget = yTarget)
+
+wrapChiSqTest(treatedTestP, mname, yName, yTarget = yTarget)
+```
+
+```{r kddplot, tidy=FALSE}
+date()
+
+
+t1 = paste(mname,'trainingM data')
+print(DoubleDensityPlot(treatedTrainP, mname, yName, 
+                        title=t1))
+print(ROCPlot(treatedTrainP, mname, yName, yTarget,
+              title=t1))
+print(WVPlots::PRPlot(treatedTrainP, mname, yName, yTarget,
+              title=t1))
+
+t2 = paste(mname,'test data')
+print(DoubleDensityPlot(treatedTestP, mname, yName, 
+                        title=t2))
+print(ROCPlot(treatedTestP, mname, yName, yTarget,
+              title=t2))
+print(WVPlots::PRPlot(treatedTestP, mname, yName, yTarget,
+              title=t2))
+
+print(date())
+print("*****************************")
+date()
+```
+
+```{r shutdown, tidy=FALSE}
+if(!is.null(cl)) {
+    parallel::stopCluster(cl)
+    cl = NULL
+}
+```
+
