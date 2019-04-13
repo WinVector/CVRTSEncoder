@@ -8,7 +8,7 @@ KDD2009 example using the `vtreat` `R` package.
 date()
 ```
 
-    ## [1] "Sat Apr 13 13:48:44 2019"
+    ## [1] "Sat Apr 13 14:59:11 2019"
 
 ``` r
 #load some libraries
@@ -70,13 +70,13 @@ yTarget <- 1
 date()
 ```
 
-    ## [1] "Sat Apr 13 13:48:53 2019"
+    ## [1] "Sat Apr 13 14:59:17 2019"
 
 ``` r
 date()
 ```
 
-    ## [1] "Sat Apr 13 13:48:53 2019"
+    ## [1] "Sat Apr 13 14:59:17 2019"
 
 ``` r
 # Run other models (with proper coding/training separation).
@@ -94,9 +94,9 @@ cfe = mkCrossFrameCExperiment(dTrain,
                               parallelCluster=cl)
 ```
 
-    ## [1] "vtreat 1.4.0 start initial treatment design Sat Apr 13 13:48:53 2019"
-    ## [1] " start cross frame work Sat Apr 13 13:51:01 2019"
-    ## [1] " vtreat::mkCrossFrameCExperiment done Sat Apr 13 13:52:52 2019"
+    ## [1] "vtreat 1.4.0 start initial treatment design Sat Apr 13 14:59:17 2019"
+    ## [1] " start cross frame work Sat Apr 13 15:01:21 2019"
+    ## [1] " vtreat::mkCrossFrameCExperiment done Sat Apr 13 15:03:12 2019"
 
 ``` r
 treatmentsC = cfe$treatments
@@ -128,13 +128,13 @@ treatedTestP = treatedTest[, yName, drop=FALSE]
 date()
 ```
 
-    ## [1] "Sat Apr 13 13:52:52 2019"
+    ## [1] "Sat Apr 13 15:03:12 2019"
 
 ``` r
 date()
 ```
 
-    ## [1] "Sat Apr 13 13:52:52 2019"
+    ## [1] "Sat Apr 13 15:03:12 2019"
 
 ``` r
 mname = 'glmnet_pred'
@@ -160,31 +160,31 @@ treatedTestP[[mname]] = as.numeric(predict(
 date()
 ```
 
-    ## [1] "Sat Apr 13 13:57:43 2019"
+    ## [1] "Sat Apr 13 15:07:36 2019"
 
 ``` r
 calcAUC(treatedTestP[[mname]], treatedTestP[[yName]]==yTarget)
 ```
 
-    ## [1] 0.7409803
+    ## [1] 0.7398914
 
 ``` r
 permTestAUC(treatedTestP, mname, yName, yTarget = yTarget)
 ```
 
-    ## [1] "AUC test alt. hyp. AUC>AUC(permuted): (AUC=0.741, s.d.=0.01579, p<1e-05)."
+    ## [1] "AUC test alt. hyp. AUC>AUC(permuted): (AUC=0.7399, s.d.=0.01618, p<1e-05)."
 
 ``` r
 wrapChiSqTest(treatedTestP, mname, yName, yTarget = yTarget)
 ```
 
-    ## [1] "Chi-Square Test summary: pseudo-R2=0.09709 (X2(1,N=4975)=258.7, p<1e-05)."
+    ## [1] "Chi-Square Test summary: pseudo-R2=0.09698 (X2(1,N=4975)=258.4, p<1e-05)."
 
 ``` r
 date()
 ```
 
-    ## [1] "Sat Apr 13 13:57:43 2019"
+    ## [1] "Sat Apr 13 15:07:36 2019"
 
 ``` r
 t1 = paste(mname,'trainingM data')
@@ -234,7 +234,7 @@ print(WVPlots::PRPlot(treatedTestP, mname, yName, yTarget,
 print(date())
 ```
 
-    ## [1] "Sat Apr 13 13:57:45 2019"
+    ## [1] "Sat Apr 13 15:07:38 2019"
 
 ``` r
 print("*****************************")
@@ -246,14 +246,14 @@ print("*****************************")
 date()
 ```
 
-    ## [1] "Sat Apr 13 13:57:45 2019"
+    ## [1] "Sat Apr 13 15:07:38 2019"
 
 ``` r
 # enrich with CVRRS encoded variables
 date()
 ```
 
-    ## [1] "Sat Apr 13 13:57:47 2019"
+    ## [1] "Sat Apr 13 15:07:40 2019"
 
 ``` r
 # encode as in https://github.com/WinVector/CVRTSEncoder
@@ -272,7 +272,7 @@ cross_enc <- estimate_residual_encoding_c(
   fit_predict = xgboost_fit_predict_c,
   dep_var = yName,
   dep_target = yTarget,
-  n_comp = 50,
+  n_comp = 20,
   cl = cl
 )
 te_vars <- colnames(cross_enc$cross_frame)
@@ -283,13 +283,13 @@ dTest <- cbind(dTest,prepare(cross_enc$coder, dTest))
 date()
 ```
 
-    ## [1] "Sat Apr 13 13:59:45 2019"
+    ## [1] "Sat Apr 13 15:09:36 2019"
 
 ``` r
 date()
 ```
 
-    ## [1] "Sat Apr 13 13:59:45 2019"
+    ## [1] "Sat Apr 13 15:09:36 2019"
 
 ``` r
 # Run other models (with proper coding/training separation).
@@ -307,9 +307,9 @@ cfe = mkCrossFrameCExperiment(dTrain,
                               parallelCluster=cl)
 ```
 
-    ## [1] "vtreat 1.4.0 start initial treatment design Sat Apr 13 13:59:45 2019"
-    ## [1] " start cross frame work Sat Apr 13 14:02:28 2019"
-    ## [1] " vtreat::mkCrossFrameCExperiment done Sat Apr 13 14:04:10 2019"
+    ## [1] "vtreat 1.4.0 start initial treatment design Sat Apr 13 15:09:36 2019"
+    ## [1] " start cross frame work Sat Apr 13 15:11:41 2019"
+    ## [1] " vtreat::mkCrossFrameCExperiment done Sat Apr 13 15:13:00 2019"
 
 ``` r
 treatmentsC = cfe$treatments
@@ -319,7 +319,7 @@ table(scoreFrame$code)
 
     ## 
     ##      clean      isBAD   knearest PiecewiseV 
-    ##        223        171         53        216
+    ##        193        171         23        186
 
 ``` r
 selvars <- scoreFrame$varName[scoreFrame$sig<1/nrow(scoreFrame)]
@@ -339,20 +339,20 @@ treatedTestP = treatedTest[, yName, drop=FALSE]
 date()
 ```
 
-    ## [1] "Sat Apr 13 14:04:10 2019"
+    ## [1] "Sat Apr 13 15:13:00 2019"
 
 ``` r
 date()
 ```
 
-    ## [1] "Sat Apr 13 14:04:10 2019"
+    ## [1] "Sat Apr 13 15:13:00 2019"
 
 ``` r
 mname = 'glmnet_pred_CVRTS'
 print(paste(mname,length(selvars)))
 ```
 
-    ## [1] "glmnet_pred_CVRTS 297"
+    ## [1] "glmnet_pred_CVRTS 271"
 
 ``` r
 model <- cv.glmnet(as.matrix(treatedTrainM[, selvars, drop = FALSE]),
@@ -371,31 +371,31 @@ treatedTestP[[mname]] = as.numeric(predict(
 date()
 ```
 
-    ## [1] "Sat Apr 13 14:07:19 2019"
+    ## [1] "Sat Apr 13 15:15:28 2019"
 
 ``` r
 calcAUC(treatedTestP[[mname]], treatedTestP[[yName]]==yTarget)
 ```
 
-    ## [1] 0.737085
+    ## [1] 0.734319
 
 ``` r
 permTestAUC(treatedTestP, mname, yName, yTarget = yTarget)
 ```
 
-    ## [1] "AUC test alt. hyp. AUC>AUC(permuted): (AUC=0.7371, s.d.=0.0141, p<1e-05)."
+    ## [1] "AUC test alt. hyp. AUC>AUC(permuted): (AUC=0.7343, s.d.=0.0145, p<1e-05)."
 
 ``` r
 wrapChiSqTest(treatedTestP, mname, yName, yTarget = yTarget)
 ```
 
-    ## [1] "Chi-Square Test summary: pseudo-R2=0.09548 (X2(1,N=4975)=254.5, p<1e-05)."
+    ## [1] "Chi-Square Test summary: pseudo-R2=0.09461 (X2(1,N=4975)=252.1, p<1e-05)."
 
 ``` r
 date()
 ```
 
-    ## [1] "Sat Apr 13 14:07:19 2019"
+    ## [1] "Sat Apr 13 15:15:28 2019"
 
 ``` r
 t1 = paste(mname,'trainingM data')
@@ -445,7 +445,7 @@ print(WVPlots::PRPlot(treatedTestP, mname, yName, yTarget,
 print(date())
 ```
 
-    ## [1] "Sat Apr 13 14:07:21 2019"
+    ## [1] "Sat Apr 13 15:15:30 2019"
 
 ``` r
 print("*****************************")
@@ -457,7 +457,7 @@ print("*****************************")
 date()
 ```
 
-    ## [1] "Sat Apr 13 14:07:21 2019"
+    ## [1] "Sat Apr 13 15:15:30 2019"
 
 ``` r
 if(!is.null(cl)) {

@@ -178,7 +178,7 @@ cross_enc <- estimate_residual_encoding_c(
   fit_predict = xgboost_fit_predict_c,
   dep_var = yName,
   dep_target = yTarget,
-  n_comp = 50,
+  n_comp = 20,
   cl = cl
 )
 te_vars <- colnames(cross_enc$cross_frame)
