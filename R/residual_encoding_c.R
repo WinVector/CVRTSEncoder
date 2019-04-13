@@ -12,6 +12,11 @@ stomp_cat_column <- function(v) {
 
 table_col <- function(v, y) {
   z <- tapply(y, v, FUN = mean) - mean(y)
+  # smooth a bit to grand mean (shifted to zero)
+  counts <- tapply(rep(1, length(v)), v, FUN = sum)
+  zc <- counts[names(z)]
+  z <- z*(zc-1)/zc
+  # clean out attributes
   nms <- names(z)
   z <- as.numeric(z)
   names(z) <- nms
