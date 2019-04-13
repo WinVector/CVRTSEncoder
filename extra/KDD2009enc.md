@@ -8,7 +8,7 @@ KDD2009 example using the `vtreat` `R` package.
 date()
 ```
 
-    ## [1] "Sat Apr 13 10:32:36 2019"
+    ## [1] "Sat Apr 13 13:48:44 2019"
 
 ``` r
 #load some libraries
@@ -70,50 +70,13 @@ yTarget <- 1
 date()
 ```
 
-    ## [1] "Sat Apr 13 10:32:42 2019"
+    ## [1] "Sat Apr 13 13:48:53 2019"
 
 ``` r
 date()
 ```
 
-    ## [1] "Sat Apr 13 10:32:42 2019"
-
-``` r
-var_values <- vtreat::value_variables_C(dTrain,
-    vars,yName,yTarget,
-    smFactor=2.0, 
-    parallelCluster=cl
-    )
-summary(var_values$sig < 1/nrow(var_values))
-```
-
-    ##    Mode   FALSE    TRUE 
-    ## logical      63     149
-
-``` r
-length(vars)
-```
-
-    ## [1] 230
-
-``` r
-vars <- var_values$var[var_values$sig < 1/nrow(var_values)]
-length(vars)
-```
-
-    ## [1] 149
-
-``` r
-date()
-```
-
-    ## [1] "Sat Apr 13 10:34:54 2019"
-
-``` r
-date()
-```
-
-    ## [1] "Sat Apr 13 10:34:54 2019"
+    ## [1] "Sat Apr 13 13:48:53 2019"
 
 ``` r
 # Run other models (with proper coding/training separation).
@@ -131,9 +94,9 @@ cfe = mkCrossFrameCExperiment(dTrain,
                               parallelCluster=cl)
 ```
 
-    ## [1] "vtreat 1.4.0 start initial treatment design Sat Apr 13 10:34:54 2019"
-    ## [1] " start cross frame work Sat Apr 13 10:36:35 2019"
-    ## [1] " vtreat::mkCrossFrameCExperiment done Sat Apr 13 10:37:50 2019"
+    ## [1] "vtreat 1.4.0 start initial treatment design Sat Apr 13 13:48:53 2019"
+    ## [1] " start cross frame work Sat Apr 13 13:51:01 2019"
+    ## [1] " vtreat::mkCrossFrameCExperiment done Sat Apr 13 13:52:52 2019"
 
 ``` r
 treatmentsC = cfe$treatments
@@ -143,12 +106,12 @@ table(scoreFrame$code)
 
     ## 
     ##       catB       catP      clean      isBAD   knearest        lev 
-    ##         28         28        119        117          2        118 
+    ##         33         33        173        171          3        136 
     ## PiecewiseV 
-    ##        115
+    ##        166
 
 ``` r
-selvars <- scoreFrame$varName
+selvars <- scoreFrame$varName[scoreFrame$sig<1/nrow(scoreFrame)]
 treatedTrainM <- cfe$crossFrame[,c(yName,selvars),drop=FALSE]
 treatedTrainM[[yName]] = treatedTrainM[[yName]]==yTarget
 
@@ -165,20 +128,20 @@ treatedTestP = treatedTest[, yName, drop=FALSE]
 date()
 ```
 
-    ## [1] "Sat Apr 13 10:37:51 2019"
+    ## [1] "Sat Apr 13 13:52:52 2019"
 
 ``` r
 date()
 ```
 
-    ## [1] "Sat Apr 13 10:37:51 2019"
+    ## [1] "Sat Apr 13 13:52:52 2019"
 
 ``` r
 mname = 'glmnet_pred'
 print(paste(mname,length(selvars)))
 ```
 
-    ## [1] "glmnet_pred 527"
+    ## [1] "glmnet_pred 345"
 
 ``` r
 model <- cv.glmnet(as.matrix(treatedTrainM[, selvars, drop = FALSE]),
@@ -197,31 +160,31 @@ treatedTestP[[mname]] = as.numeric(predict(
 date()
 ```
 
-    ## [1] "Sat Apr 13 10:44:53 2019"
+    ## [1] "Sat Apr 13 13:57:43 2019"
 
 ``` r
 calcAUC(treatedTestP[[mname]], treatedTestP[[yName]]==yTarget)
 ```
 
-    ## [1] 0.7396792
+    ## [1] 0.7409803
 
 ``` r
 permTestAUC(treatedTestP, mname, yName, yTarget = yTarget)
 ```
 
-    ## [1] "AUC test alt. hyp. AUC>AUC(permuted): (AUC=0.7397, s.d.=0.01334, p<1e-05)."
+    ## [1] "AUC test alt. hyp. AUC>AUC(permuted): (AUC=0.741, s.d.=0.01579, p<1e-05)."
 
 ``` r
 wrapChiSqTest(treatedTestP, mname, yName, yTarget = yTarget)
 ```
 
-    ## [1] "Chi-Square Test summary: pseudo-R2=0.09906 (X2(1,N=4975)=264, p<1e-05)."
+    ## [1] "Chi-Square Test summary: pseudo-R2=0.09709 (X2(1,N=4975)=258.7, p<1e-05)."
 
 ``` r
 date()
 ```
 
-    ## [1] "Sat Apr 13 10:44:53 2019"
+    ## [1] "Sat Apr 13 13:57:43 2019"
 
 ``` r
 t1 = paste(mname,'trainingM data')
@@ -271,7 +234,7 @@ print(WVPlots::PRPlot(treatedTestP, mname, yName, yTarget,
 print(date())
 ```
 
-    ## [1] "Sat Apr 13 10:44:56 2019"
+    ## [1] "Sat Apr 13 13:57:45 2019"
 
 ``` r
 print("*****************************")
@@ -283,87 +246,50 @@ print("*****************************")
 date()
 ```
 
-    ## [1] "Sat Apr 13 10:44:56 2019"
+    ## [1] "Sat Apr 13 13:57:45 2019"
 
 ``` r
 # enrich with CVRRS encoded variables
 date()
 ```
 
-    ## [1] "Sat Apr 13 10:44:57 2019"
+    ## [1] "Sat Apr 13 13:57:47 2019"
 
 ``` r
 # encode as in https://github.com/WinVector/CVRTSEncoder
-
-categorical_cols <- vapply(
+is_cat_var <- vapply(
   vars,
   function(ci) {
     is.character(dTrain[[ci]]) || is.factor(dTrain[[ci]])
   }, logical(1))
-categorical_cols <- vars[categorical_cols]
+categorical_cols <- vars[is_cat_var]
+numeric_cols <- vars[!is_cat_var]
 
 cross_enc <- estimate_residual_encoding_c(
   data = dTrain,
-  avars = setdiff(vars, categorical_cols),
+  avars = numeric_cols,
   evars = categorical_cols,
   fit_predict = xgboost_fit_predict_c,
   dep_var = yName,
   dep_target = yTarget,
-  n_comp = 20,
+  n_comp = 50,
   cl = cl
 )
 te_vars <- colnames(cross_enc$cross_frame)
-vars <- c(vars, te_vars)
+vars <- c(numeric_cols, te_vars)
 dTrain <- cbind(dTrain, cross_enc$cross_frame)
 dTest <- cbind(dTest,prepare(cross_enc$coder, dTest))
 
 date()
 ```
 
-    ## [1] "Sat Apr 13 10:46:25 2019"
+    ## [1] "Sat Apr 13 13:59:45 2019"
 
 ``` r
 date()
 ```
 
-    ## [1] "Sat Apr 13 10:46:25 2019"
-
-``` r
-var_values <- vtreat::value_variables_C(dTrain,
-    vars,yName,yTarget,
-    smFactor=2.0, 
-    parallelCluster=cl
-    )
-summary(var_values$sig < 1/nrow(var_values))
-```
-
-    ##    Mode   FALSE    TRUE 
-    ## logical       1     168
-
-``` r
-length(vars)
-```
-
-    ## [1] 169
-
-``` r
-vars <- var_values$var[var_values$sig < 1/nrow(var_values)]
-length(vars)
-```
-
-    ## [1] 168
-
-``` r
-date()
-```
-
-    ## [1] "Sat Apr 13 10:49:23 2019"
-
-``` r
-date()
-```
-
-    ## [1] "Sat Apr 13 10:49:23 2019"
+    ## [1] "Sat Apr 13 13:59:45 2019"
 
 ``` r
 # Run other models (with proper coding/training separation).
@@ -381,9 +307,9 @@ cfe = mkCrossFrameCExperiment(dTrain,
                               parallelCluster=cl)
 ```
 
-    ## [1] "vtreat 1.4.0 start initial treatment design Sat Apr 13 10:49:23 2019"
-    ## [1] " start cross frame work Sat Apr 13 10:51:38 2019"
-    ## [1] " vtreat::mkCrossFrameCExperiment done Sat Apr 13 10:52:56 2019"
+    ## [1] "vtreat 1.4.0 start initial treatment design Sat Apr 13 13:59:45 2019"
+    ## [1] " start cross frame work Sat Apr 13 14:02:28 2019"
+    ## [1] " vtreat::mkCrossFrameCExperiment done Sat Apr 13 14:04:10 2019"
 
 ``` r
 treatmentsC = cfe$treatments
@@ -392,13 +318,11 @@ table(scoreFrame$code)
 ```
 
     ## 
-    ##       catB       catP      clean      isBAD   knearest        lev 
-    ##         28         28        138        117         21        118 
-    ## PiecewiseV 
-    ##        134
+    ##      clean      isBAD   knearest PiecewiseV 
+    ##        223        171         53        216
 
 ``` r
-selvars <- scoreFrame$varName
+selvars <- scoreFrame$varName[scoreFrame$sig<1/nrow(scoreFrame)]
 treatedTrainM <- cfe$crossFrame[,c(yName,selvars),drop=FALSE]
 treatedTrainM[[yName]] = treatedTrainM[[yName]]==yTarget
 
@@ -415,20 +339,20 @@ treatedTestP = treatedTest[, yName, drop=FALSE]
 date()
 ```
 
-    ## [1] "Sat Apr 13 10:52:57 2019"
+    ## [1] "Sat Apr 13 14:04:10 2019"
 
 ``` r
 date()
 ```
 
-    ## [1] "Sat Apr 13 10:52:57 2019"
+    ## [1] "Sat Apr 13 14:04:10 2019"
 
 ``` r
 mname = 'glmnet_pred_CVRTS'
 print(paste(mname,length(selvars)))
 ```
 
-    ## [1] "glmnet_pred_CVRTS 584"
+    ## [1] "glmnet_pred_CVRTS 297"
 
 ``` r
 model <- cv.glmnet(as.matrix(treatedTrainM[, selvars, drop = FALSE]),
@@ -447,31 +371,31 @@ treatedTestP[[mname]] = as.numeric(predict(
 date()
 ```
 
-    ## [1] "Sat Apr 13 11:00:59 2019"
+    ## [1] "Sat Apr 13 14:07:19 2019"
 
 ``` r
 calcAUC(treatedTestP[[mname]], treatedTestP[[yName]]==yTarget)
 ```
 
-    ## [1] 0.7404541
+    ## [1] 0.737085
 
 ``` r
 permTestAUC(treatedTestP, mname, yName, yTarget = yTarget)
 ```
 
-    ## [1] "AUC test alt. hyp. AUC>AUC(permuted): (AUC=0.7405, s.d.=0.01388, p<1e-05)."
+    ## [1] "AUC test alt. hyp. AUC>AUC(permuted): (AUC=0.7371, s.d.=0.0141, p<1e-05)."
 
 ``` r
 wrapChiSqTest(treatedTestP, mname, yName, yTarget = yTarget)
 ```
 
-    ## [1] "Chi-Square Test summary: pseudo-R2=0.09973 (X2(1,N=4975)=265.8, p<1e-05)."
+    ## [1] "Chi-Square Test summary: pseudo-R2=0.09548 (X2(1,N=4975)=254.5, p<1e-05)."
 
 ``` r
 date()
 ```
 
-    ## [1] "Sat Apr 13 11:00:59 2019"
+    ## [1] "Sat Apr 13 14:07:19 2019"
 
 ``` r
 t1 = paste(mname,'trainingM data')
@@ -521,7 +445,7 @@ print(WVPlots::PRPlot(treatedTestP, mname, yName, yTarget,
 print(date())
 ```
 
-    ## [1] "Sat Apr 13 11:01:01 2019"
+    ## [1] "Sat Apr 13 14:07:21 2019"
 
 ``` r
 print("*****************************")
@@ -533,7 +457,7 @@ print("*****************************")
 date()
 ```
 
-    ## [1] "Sat Apr 13 11:01:01 2019"
+    ## [1] "Sat Apr 13 14:07:21 2019"
 
 ``` r
 if(!is.null(cl)) {

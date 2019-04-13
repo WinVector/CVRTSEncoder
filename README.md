@@ -1,32 +1,17 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+[`CVRTSEncoder`](https://github.com/WinVector/CVRTSEncoder) is a categorical variable encoding for supervised learning.
 
-[`CVRTSEncoder`](https://github.com/WinVector/CVRTSEncoder) is a
-categorical variable encoding for supervised learning.
+Re-encode a set of categorical variables jointly as a spectral projection of the trajectory of modeling residuals. This is intended as a succinct numeric linear representation of a set of categorical variables in a manner that is useful for supervised learning.
 
-Re-encode a set of categorical variables jointly as a spectral
-projection of the trajectory of modeling residuals. This is intended as
-a succinct numeric linear representation of a set of categorical
-variables in a manner that is useful for supervised learning.
+The concept is y-aware encoding the trajectory of non-linear model residuals in terms of target categorical variables.
 
-The concept is y-aware encoding the trajectory of non-linear model
-residuals in terms of target categorical variables.
+The idea is an extension of the [`vtreat`](https://github.com/WinVector/vtreat) coding [concepts](https://github.com/WinVector/vtreat/blob/master/extras/vtreat.pdf) and of the y-aware scaling concepts of Nina Zumel and John Mount:
 
-The idea is an extension of the
-[`vtreat`](https://github.com/WinVector/vtreat) coding
-[concepts](https://github.com/WinVector/vtreat/blob/master/extras/vtreat.pdf)
-and of the y-aware scaling concepts of Nina Zumel and John Mount:
-
-  - [Principal Components Regression, Pt.1: The Standard
-    Method](http://www.win-vector.com/blog/2016/05/pcr_part1_xonly/)
-  - [Principal Components Regression, Pt. 2: Y-Aware
-    Methods](http://www.win-vector.com/blog/2016/05/pcr_part2_yaware/)
-  - [Principal Components Regression, Pt. 3: Picking the Number of
-    Components](http://www.win-vector.com/blog/2016/05/pcr_part3_pickk/)
-  - [y-aware scaling in
-    context](http://www.win-vector.com/blog/2016/06/y-aware-scaling-in-context/).
-
-<!-- end list -->
+-   [Principal Components Regression, Pt.1: The Standard Method](http://www.win-vector.com/blog/2016/05/pcr_part1_xonly/)
+-   [Principal Components Regression, Pt. 2: Y-Aware Methods](http://www.win-vector.com/blog/2016/05/pcr_part2_yaware/)
+-   [Principal Components Regression, Pt. 3: Picking the Number of Components](http://www.win-vector.com/blog/2016/05/pcr_part3_pickk/)
+-   [y-aware scaling in context](http://www.win-vector.com/blog/2016/06/y-aware-scaling-in-context/).
 
 ``` r
 library("CVRTSEncoder")
@@ -101,13 +86,13 @@ summary(model)
  #  
  #  Coefficients:
  #                 Estimate Std. Error z value Pr(>|z|)   
- #  (Intercept)  -3.755e+00  2.283e+06   0.000  1.00000   
+ #  (Intercept)  -3.773e+00  2.283e+06   0.000  1.00000   
  #  Sepal.Length  3.507e+00  1.665e+00   2.106  0.03517 * 
  #  Petal.Length -1.170e+01  3.770e+00  -3.103  0.00191 **
- #  c_001         1.381e+02  4.828e+06   0.000  0.99998   
- #  c_002        -2.832e+02  2.992e+07   0.000  0.99999   
- #  c_003        -8.104e+01  1.119e+07   0.000  0.99999   
- #  c_004         2.257e+03  3.610e+05   0.006  0.99501   
+ #  c_001         6.073e+01  3.387e+06   0.000  0.99999   
+ #  c_002         1.707e+02  1.730e+07   0.000  0.99999   
+ #  c_003        -2.652e+02  3.095e+07   0.000  0.99999   
+ #  c_004        -6.121e+02  4.791e+05  -0.001  0.99898   
  #  ---
  #  Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
  #  

@@ -60,23 +60,6 @@ date()
 
 
 
-```{r kddvarsel_a}
-date()
-
-var_values <- vtreat::value_variables_C(dTrain,
-    vars,yName,yTarget,
-    smFactor=2.0, 
-    parallelCluster=cl
-    )
-summary(var_values$sig < 1/nrow(var_values))
-
-length(vars)
-vars <- var_values$var[var_values$sig < 1/nrow(var_values)]
-length(vars)
-
-date()
-```
-
 
 ```{r kddtreat_a, tidy=FALSE}
 date()
@@ -99,7 +82,7 @@ cfe = mkCrossFrameCExperiment(dTrain,
 treatmentsC = cfe$treatments
 scoreFrame = treatmentsC$scoreFrame
 table(scoreFrame$code)
-selvars <- scoreFrame$varName
+selvars <- scoreFrame$varName[scoreFrame$sig<1/nrow(scoreFrame)]
 treatedTrainM <- cfe$crossFrame[,c(yName,selvars),drop=FALSE]
 treatedTrainM[[yName]] = treatedTrainM[[yName]]==yTarget
 
@@ -180,26 +163,26 @@ date()
 date()
 
 # encode as in https://github.com/WinVector/CVRTSEncoder
-
-categorical_cols <- vapply(
+is_cat_var <- vapply(
   vars,
   function(ci) {
     is.character(dTrain[[ci]]) || is.factor(dTrain[[ci]])
   }, logical(1))
-categorical_cols <- vars[categorical_cols]
+categorical_cols <- vars[is_cat_var]
+numeric_cols <- vars[!is_cat_var]
 
 cross_enc <- estimate_residual_encoding_c(
   data = dTrain,
-  avars = setdiff(vars, categorical_cols),
+  avars = numeric_cols,
   evars = categorical_cols,
   fit_predict = xgboost_fit_predict_c,
   dep_var = yName,
   dep_target = yTarget,
-  n_comp = 20,
+  n_comp = 50,
   cl = cl
 )
 te_vars <- colnames(cross_enc$cross_frame)
-vars <- c(vars, te_vars)
+vars <- c(numeric_cols, te_vars)
 dTrain <- cbind(dTrain, cross_enc$cross_frame)
 dTest <- cbind(dTest,prepare(cross_enc$coder, dTest))
 
@@ -207,22 +190,6 @@ date()
 ```
 
 
-```{r kddvarsel}
-date()
-
-var_values <- vtreat::value_variables_C(dTrain,
-    vars,yName,yTarget,
-    smFactor=2.0, 
-    parallelCluster=cl
-    )
-summary(var_values$sig < 1/nrow(var_values))
-
-length(vars)
-vars <- var_values$var[var_values$sig < 1/nrow(var_values)]
-length(vars)
-
-date()
-```
 
 
 ```{r kddtreat, tidy=FALSE}
@@ -246,7 +213,7 @@ cfe = mkCrossFrameCExperiment(dTrain,
 treatmentsC = cfe$treatments
 scoreFrame = treatmentsC$scoreFrame
 table(scoreFrame$code)
-selvars <- scoreFrame$varName
+selvars <- scoreFrame$varName[scoreFrame$sig<1/nrow(scoreFrame)]
 treatedTrainM <- cfe$crossFrame[,c(yName,selvars),drop=FALSE]
 treatedTrainM[[yName]] = treatedTrainM[[yName]]==yTarget
 

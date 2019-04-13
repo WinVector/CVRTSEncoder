@@ -75,10 +75,14 @@ xgboost_fit_predict_c <- function(train_data,
     vtreat::prepare(cfe$treatments,
                     application_data,
                     varRestriction = selvars)[, selvars, drop = FALSE])
-  resids <- matrix(0, nrow = nrow(app_matrix), ncol = length(obs_points))
+  resids <- matrix(0, nrow = nrow(app_matrix), ncol = length(obs_points)+1)
+  # null model
+  preds <- rep(mean(cfe$crossFrame[[dep_var]]==dep_target), nrow(application_data))
+  resids[, 1] <- log_residuals(application_data[[dep_var]]==dep_target, preds)
+  # model stages
   for(i in seq_len(length(obs_points))) {
     preds <- predict(model, newdata = app_matrix, ntree=obs_points[[i]])
-    resids[, i] <- log_residuals(application_data[[dep_var]]==dep_target, preds)
+    resids[, i+1] <- log_residuals(application_data[[dep_var]]==dep_target, preds)
   }
   resids
 }
