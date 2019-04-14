@@ -32,17 +32,15 @@ churn <- read.table(paste(dir, 'orange_small_train_churn.labels.txt', sep = "/")
 d$churn <- churn$V1 
 
 set.seed(729375) 
-rgroup <- base::sample(c('train', 'calibrate', 'test'), 	 
+rgroup <- base::sample(c('train', 'test'), 	 
    nrow(d), 
-   prob = c(0.8, 0.1, 0.1),
+   prob = c(0.9, 0.1),
    replace = TRUE)
 dTrain <- d[rgroup=='train', , drop = FALSE]
-dCal <- d[rgroup=='calibrate', , drop = FALSE]
-dTrainAll <- d[rgroup %in% c('train', 'calibrate'), , drop = FALSE]
 dTest <- d[rgroup == 'test', , drop = FALSE]
                                                 
 outcome <- 'churn' 
-vars <- setdiff(colnames(dTrainAll), outcome)
+vars <- setdiff(colnames(dTrain), outcome)
 
                                                 
 rm(list=c('d', 'churn', 'rgroup')) 	
@@ -54,6 +52,10 @@ ncore <- parallel::detectCores()
 
 yName <- "churn"
 yTarget <- 1
+
+# prepare plotting frames
+trainPlot = dTrain[, yName, drop=FALSE]
+testPlot = dTest[, yName, drop=FALSE]
 
 date()
 ```
@@ -93,9 +95,7 @@ treatedTest = prepare(treatmentsC,
                       parallelCluster=cl)
 treatedTest[[yName]] = treatedTest[[yName]]==yTarget
 
-# prepare plotting frames
-treatedTrainP = treatedTrainM[, yName, drop=FALSE]
-treatedTestP = treatedTest[, yName, drop=FALSE]
+
 date()
 ```
 
@@ -108,12 +108,12 @@ print(paste(mname,length(selvars)))
 model <- cv.glmnet(as.matrix(treatedTrainM[, selvars, drop = FALSE]),
                    treatedTrainM[[yName]]==yTarget,
                    family = "binomial")
-treatedTrainP[[mname]] = as.numeric(predict(
+trainPlot[[mname]] = as.numeric(predict(
   model, 
   newx = as.matrix(treatedTrainM[, selvars, drop = FALSE]),
   type = 'response',
   s = "lambda.min"))
-treatedTestP[[mname]] = as.numeric(predict(
+testPlot[[mname]] = as.numeric(predict(
   model,
   newx = as.matrix(treatedTest[, selvars, drop = FALSE]),
   type = 'response',
@@ -122,11 +122,11 @@ date()
 ```
 
 ```{r score_a}
-calcAUC(treatedTestP[[mname]], treatedTestP[[yName]]==yTarget)
+calcAUC(testPlot[[mname]], testPlot[[yName]]==yTarget)
 
-permTestAUC(treatedTestP, mname, yName, yTarget = yTarget)
+permTestAUC(testPlot, mname, yName, yTarget = yTarget)
 
-wrapChiSqTest(treatedTestP, mname, yName, yTarget = yTarget)
+wrapChiSqTest(testPlot, mname, yName, yTarget = yTarget)
 ```
 
 ```{r kddplot_a, tidy=FALSE}
@@ -134,19 +134,19 @@ date()
 
 
 t1 = paste(mname,'trainingM data')
-print(DoubleDensityPlot(treatedTrainP, mname, yName, 
+print(DoubleDensityPlot(trainPlot, mname, yName, 
                         title=t1))
-print(ROCPlot(treatedTrainP, mname, yName, yTarget,
+print(ROCPlot(trainPlot, mname, yName, yTarget,
               title=t1))
-print(WVPlots::PRPlot(treatedTrainP, mname, yName, yTarget,
+print(WVPlots::PRPlot(trainPlot, mname, yName, yTarget,
               title=t1))
 
 t2 = paste(mname,'test data')
-print(DoubleDensityPlot(treatedTestP, mname, yName, 
+print(DoubleDensityPlot(testPlot, mname, yName, 
                         title=t2))
-print(ROCPlot(treatedTestP, mname, yName, yTarget,
+print(ROCPlot(testPlot, mname, yName, yTarget,
               title=t2))
-print(WVPlots::PRPlot(treatedTestP, mname, yName, yTarget,
+print(WVPlots::PRPlot(testPlot, mname, yName, yTarget,
               title=t2))
 
 print(date())
@@ -224,9 +224,6 @@ treatedTest = prepare(treatmentsC,
                       parallelCluster=cl)
 treatedTest[[yName]] = treatedTest[[yName]]==yTarget
 
-# prepare plotting frames
-treatedTrainP = treatedTrainM[, yName, drop=FALSE]
-treatedTestP = treatedTest[, yName, drop=FALSE]
 date()
 ```
 
@@ -239,12 +236,12 @@ print(paste(mname,length(selvars)))
 model <- cv.glmnet(as.matrix(treatedTrainM[, selvars, drop = FALSE]),
                    treatedTrainM[[yName]]==yTarget,
                    family = "binomial")
-treatedTrainP[[mname]] = as.numeric(predict(
+trainPlot[[mname]] = as.numeric(predict(
   model, 
   newx = as.matrix(treatedTrainM[, selvars, drop = FALSE]),
   type = 'response',
   s = "lambda.min"))
-treatedTestP[[mname]] = as.numeric(predict(
+testPlot[[mname]] = as.numeric(predict(
   model,
   newx = as.matrix(treatedTest[, selvars, drop = FALSE]),
   type = 'response',
@@ -253,11 +250,11 @@ date()
 ```
 
 ```{r score}
-calcAUC(treatedTestP[[mname]], treatedTestP[[yName]]==yTarget)
+calcAUC(testPlot[[mname]], testPlot[[yName]]==yTarget)
 
-permTestAUC(treatedTestP, mname, yName, yTarget = yTarget)
+permTestAUC(testPlot, mname, yName, yTarget = yTarget)
 
-wrapChiSqTest(treatedTestP, mname, yName, yTarget = yTarget)
+wrapChiSqTest(testPlot, mname, yName, yTarget = yTarget)
 ```
 
 ```{r kddplot, tidy=FALSE}
@@ -265,25 +262,34 @@ date()
 
 
 t1 = paste(mname,'trainingM data')
-print(DoubleDensityPlot(treatedTrainP, mname, yName, 
+print(DoubleDensityPlot(trainPlot, mname, yName, 
                         title=t1))
-print(ROCPlot(treatedTrainP, mname, yName, yTarget,
+print(ROCPlot(trainPlot, mname, yName, yTarget,
               title=t1))
-print(WVPlots::PRPlot(treatedTrainP, mname, yName, yTarget,
+print(WVPlots::PRPlot(trainPlot, mname, yName, yTarget,
               title=t1))
 
 t2 = paste(mname,'test data')
-print(DoubleDensityPlot(treatedTestP, mname, yName, 
+print(DoubleDensityPlot(testPlot, mname, yName, 
                         title=t2))
-print(ROCPlot(treatedTestP, mname, yName, yTarget,
+print(ROCPlot(testPlot, mname, yName, yTarget,
               title=t2))
-print(WVPlots::PRPlot(treatedTestP, mname, yName, yTarget,
+print(WVPlots::PRPlot(testPlot, mname, yName, yTarget,
               title=t2))
 
 print(date())
 print("*****************************")
 date()
 ```
+
+```{r compare}
+WVPlots::ROCPlotPair(testPlot, 
+                     "glmnet_pred", "glmnet_pred_CVRTS",
+                     yName, yTarget, "ROC on test",
+                     estimate_sig = TRUE,
+                     parallelCluster = cl)
+```
+
 
 ```{r shutdown, tidy=FALSE}
 if(!is.null(cl)) {

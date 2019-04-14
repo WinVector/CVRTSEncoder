@@ -8,7 +8,7 @@ KDD2009 example using the `vtreat` `R` package.
 date()
 ```
 
-    ## [1] "Sat Apr 13 14:59:11 2019"
+    ## [1] "Sat Apr 13 18:00:23 2019"
 
 ``` r
 #load some libraries
@@ -40,17 +40,15 @@ churn <- read.table(paste(dir, 'orange_small_train_churn.labels.txt', sep = "/")
 d$churn <- churn$V1 
 
 set.seed(729375) 
-rgroup <- base::sample(c('train', 'calibrate', 'test'),      
+rgroup <- base::sample(c('train', 'test'),   
    nrow(d), 
-   prob = c(0.8, 0.1, 0.1),
+   prob = c(0.9, 0.1),
    replace = TRUE)
 dTrain <- d[rgroup=='train', , drop = FALSE]
-dCal <- d[rgroup=='calibrate', , drop = FALSE]
-dTrainAll <- d[rgroup %in% c('train', 'calibrate'), , drop = FALSE]
 dTest <- d[rgroup == 'test', , drop = FALSE]
                                                 
 outcome <- 'churn' 
-vars <- setdiff(colnames(dTrainAll), outcome)
+vars <- setdiff(colnames(dTrain), outcome)
 
                                                 
 rm(list=c('d', 'churn', 'rgroup'))  
@@ -67,16 +65,20 @@ ncore <- parallel::detectCores()
 yName <- "churn"
 yTarget <- 1
 
+# prepare plotting frames
+trainPlot = dTrain[, yName, drop=FALSE]
+testPlot = dTest[, yName, drop=FALSE]
+
 date()
 ```
 
-    ## [1] "Sat Apr 13 14:59:17 2019"
+    ## [1] "Sat Apr 13 18:00:30 2019"
 
 ``` r
 date()
 ```
 
-    ## [1] "Sat Apr 13 14:59:17 2019"
+    ## [1] "Sat Apr 13 18:00:30 2019"
 
 ``` r
 # Run other models (with proper coding/training separation).
@@ -94,9 +96,9 @@ cfe = mkCrossFrameCExperiment(dTrain,
                               parallelCluster=cl)
 ```
 
-    ## [1] "vtreat 1.4.0 start initial treatment design Sat Apr 13 14:59:17 2019"
-    ## [1] " start cross frame work Sat Apr 13 15:01:21 2019"
-    ## [1] " vtreat::mkCrossFrameCExperiment done Sat Apr 13 15:03:12 2019"
+    ## [1] "vtreat 1.4.0 start initial treatment design Sat Apr 13 18:00:30 2019"
+    ## [1] " start cross frame work Sat Apr 13 18:02:54 2019"
+    ## [1] " vtreat::mkCrossFrameCExperiment done Sat Apr 13 18:04:09 2019"
 
 ``` r
 treatmentsC = cfe$treatments
@@ -106,7 +108,7 @@ table(scoreFrame$code)
 
     ## 
     ##       catB       catP      clean      isBAD   knearest        lev 
-    ##         33         33        173        171          3        136 
+    ##         33         33        173        171          3        137 
     ## PiecewiseV 
     ##        166
 
@@ -122,37 +124,35 @@ treatedTest = prepare(treatmentsC,
                       parallelCluster=cl)
 treatedTest[[yName]] = treatedTest[[yName]]==yTarget
 
-# prepare plotting frames
-treatedTrainP = treatedTrainM[, yName, drop=FALSE]
-treatedTestP = treatedTest[, yName, drop=FALSE]
+
 date()
 ```
 
-    ## [1] "Sat Apr 13 15:03:12 2019"
+    ## [1] "Sat Apr 13 18:04:09 2019"
 
 ``` r
 date()
 ```
 
-    ## [1] "Sat Apr 13 15:03:12 2019"
+    ## [1] "Sat Apr 13 18:04:09 2019"
 
 ``` r
 mname = 'glmnet_pred'
 print(paste(mname,length(selvars)))
 ```
 
-    ## [1] "glmnet_pred 345"
+    ## [1] "glmnet_pred 360"
 
 ``` r
 model <- cv.glmnet(as.matrix(treatedTrainM[, selvars, drop = FALSE]),
                    treatedTrainM[[yName]]==yTarget,
                    family = "binomial")
-treatedTrainP[[mname]] = as.numeric(predict(
+trainPlot[[mname]] = as.numeric(predict(
   model, 
   newx = as.matrix(treatedTrainM[, selvars, drop = FALSE]),
   type = 'response',
   s = "lambda.min"))
-treatedTestP[[mname]] = as.numeric(predict(
+testPlot[[mname]] = as.numeric(predict(
   model,
   newx = as.matrix(treatedTest[, selvars, drop = FALSE]),
   type = 'response',
@@ -160,49 +160,49 @@ treatedTestP[[mname]] = as.numeric(predict(
 date()
 ```
 
-    ## [1] "Sat Apr 13 15:07:36 2019"
+    ## [1] "Sat Apr 13 18:10:04 2019"
 
 ``` r
-calcAUC(treatedTestP[[mname]], treatedTestP[[yName]]==yTarget)
+calcAUC(testPlot[[mname]], testPlot[[yName]]==yTarget)
 ```
 
-    ## [1] 0.7398914
+    ## [1] 0.7359275
 
 ``` r
-permTestAUC(treatedTestP, mname, yName, yTarget = yTarget)
+permTestAUC(testPlot, mname, yName, yTarget = yTarget)
 ```
 
-    ## [1] "AUC test alt. hyp. AUC>AUC(permuted): (AUC=0.7399, s.d.=0.01618, p<1e-05)."
+    ## [1] "AUC test alt. hyp. AUC>AUC(permuted): (AUC=0.7359, s.d.=0.01604, p<1e-05)."
 
 ``` r
-wrapChiSqTest(treatedTestP, mname, yName, yTarget = yTarget)
+wrapChiSqTest(testPlot, mname, yName, yTarget = yTarget)
 ```
 
-    ## [1] "Chi-Square Test summary: pseudo-R2=0.09698 (X2(1,N=4975)=258.4, p<1e-05)."
+    ## [1] "Chi-Square Test summary: pseudo-R2=0.1028 (X2(1,N=4972)=261.9, p<1e-05)."
 
 ``` r
 date()
 ```
 
-    ## [1] "Sat Apr 13 15:07:36 2019"
+    ## [1] "Sat Apr 13 18:10:04 2019"
 
 ``` r
 t1 = paste(mname,'trainingM data')
-print(DoubleDensityPlot(treatedTrainP, mname, yName, 
+print(DoubleDensityPlot(trainPlot, mname, yName, 
                         title=t1))
 ```
 
 ![](KDD2009enc_files/figure-markdown_github/kddplot_a-1.png)
 
 ``` r
-print(ROCPlot(treatedTrainP, mname, yName, yTarget,
+print(ROCPlot(trainPlot, mname, yName, yTarget,
               title=t1))
 ```
 
 ![](KDD2009enc_files/figure-markdown_github/kddplot_a-2.png)
 
 ``` r
-print(WVPlots::PRPlot(treatedTrainP, mname, yName, yTarget,
+print(WVPlots::PRPlot(trainPlot, mname, yName, yTarget,
               title=t1))
 ```
 
@@ -210,21 +210,21 @@ print(WVPlots::PRPlot(treatedTrainP, mname, yName, yTarget,
 
 ``` r
 t2 = paste(mname,'test data')
-print(DoubleDensityPlot(treatedTestP, mname, yName, 
+print(DoubleDensityPlot(testPlot, mname, yName, 
                         title=t2))
 ```
 
 ![](KDD2009enc_files/figure-markdown_github/kddplot_a-4.png)
 
 ``` r
-print(ROCPlot(treatedTestP, mname, yName, yTarget,
+print(ROCPlot(testPlot, mname, yName, yTarget,
               title=t2))
 ```
 
 ![](KDD2009enc_files/figure-markdown_github/kddplot_a-5.png)
 
 ``` r
-print(WVPlots::PRPlot(treatedTestP, mname, yName, yTarget,
+print(WVPlots::PRPlot(testPlot, mname, yName, yTarget,
               title=t2))
 ```
 
@@ -234,7 +234,7 @@ print(WVPlots::PRPlot(treatedTestP, mname, yName, yTarget,
 print(date())
 ```
 
-    ## [1] "Sat Apr 13 15:07:38 2019"
+    ## [1] "Sat Apr 13 18:10:06 2019"
 
 ``` r
 print("*****************************")
@@ -246,14 +246,14 @@ print("*****************************")
 date()
 ```
 
-    ## [1] "Sat Apr 13 15:07:38 2019"
+    ## [1] "Sat Apr 13 18:10:06 2019"
 
 ``` r
 # enrich with CVRRS encoded variables
 date()
 ```
 
-    ## [1] "Sat Apr 13 15:07:40 2019"
+    ## [1] "Sat Apr 13 18:10:07 2019"
 
 ``` r
 # encode as in https://github.com/WinVector/CVRTSEncoder
@@ -283,13 +283,13 @@ dTest <- cbind(dTest,prepare(cross_enc$coder, dTest))
 date()
 ```
 
-    ## [1] "Sat Apr 13 15:09:36 2019"
+    ## [1] "Sat Apr 13 18:12:22 2019"
 
 ``` r
 date()
 ```
 
-    ## [1] "Sat Apr 13 15:09:36 2019"
+    ## [1] "Sat Apr 13 18:12:22 2019"
 
 ``` r
 # Run other models (with proper coding/training separation).
@@ -307,9 +307,9 @@ cfe = mkCrossFrameCExperiment(dTrain,
                               parallelCluster=cl)
 ```
 
-    ## [1] "vtreat 1.4.0 start initial treatment design Sat Apr 13 15:09:36 2019"
-    ## [1] " start cross frame work Sat Apr 13 15:11:41 2019"
-    ## [1] " vtreat::mkCrossFrameCExperiment done Sat Apr 13 15:13:00 2019"
+    ## [1] "vtreat 1.4.0 start initial treatment design Sat Apr 13 18:12:22 2019"
+    ## [1] " start cross frame work Sat Apr 13 18:14:47 2019"
+    ## [1] " vtreat::mkCrossFrameCExperiment done Sat Apr 13 18:16:32 2019"
 
 ``` r
 treatmentsC = cfe$treatments
@@ -333,37 +333,34 @@ treatedTest = prepare(treatmentsC,
                       parallelCluster=cl)
 treatedTest[[yName]] = treatedTest[[yName]]==yTarget
 
-# prepare plotting frames
-treatedTrainP = treatedTrainM[, yName, drop=FALSE]
-treatedTestP = treatedTest[, yName, drop=FALSE]
 date()
 ```
 
-    ## [1] "Sat Apr 13 15:13:00 2019"
+    ## [1] "Sat Apr 13 18:16:32 2019"
 
 ``` r
 date()
 ```
 
-    ## [1] "Sat Apr 13 15:13:00 2019"
+    ## [1] "Sat Apr 13 18:16:32 2019"
 
 ``` r
 mname = 'glmnet_pred_CVRTS'
 print(paste(mname,length(selvars)))
 ```
 
-    ## [1] "glmnet_pred_CVRTS 271"
+    ## [1] "glmnet_pred_CVRTS 292"
 
 ``` r
 model <- cv.glmnet(as.matrix(treatedTrainM[, selvars, drop = FALSE]),
                    treatedTrainM[[yName]]==yTarget,
                    family = "binomial")
-treatedTrainP[[mname]] = as.numeric(predict(
+trainPlot[[mname]] = as.numeric(predict(
   model, 
   newx = as.matrix(treatedTrainM[, selvars, drop = FALSE]),
   type = 'response',
   s = "lambda.min"))
-treatedTestP[[mname]] = as.numeric(predict(
+testPlot[[mname]] = as.numeric(predict(
   model,
   newx = as.matrix(treatedTest[, selvars, drop = FALSE]),
   type = 'response',
@@ -371,49 +368,49 @@ treatedTestP[[mname]] = as.numeric(predict(
 date()
 ```
 
-    ## [1] "Sat Apr 13 15:15:28 2019"
+    ## [1] "Sat Apr 13 18:20:11 2019"
 
 ``` r
-calcAUC(treatedTestP[[mname]], treatedTestP[[yName]]==yTarget)
+calcAUC(testPlot[[mname]], testPlot[[yName]]==yTarget)
 ```
 
-    ## [1] 0.734319
+    ## [1] 0.7398944
 
 ``` r
-permTestAUC(treatedTestP, mname, yName, yTarget = yTarget)
+permTestAUC(testPlot, mname, yName, yTarget = yTarget)
 ```
 
-    ## [1] "AUC test alt. hyp. AUC>AUC(permuted): (AUC=0.7343, s.d.=0.0145, p<1e-05)."
+    ## [1] "AUC test alt. hyp. AUC>AUC(permuted): (AUC=0.7399, s.d.=0.01458, p<1e-05)."
 
 ``` r
-wrapChiSqTest(treatedTestP, mname, yName, yTarget = yTarget)
+wrapChiSqTest(testPlot, mname, yName, yTarget = yTarget)
 ```
 
-    ## [1] "Chi-Square Test summary: pseudo-R2=0.09461 (X2(1,N=4975)=252.1, p<1e-05)."
+    ## [1] "Chi-Square Test summary: pseudo-R2=0.1023 (X2(1,N=4972)=260.5, p<1e-05)."
 
 ``` r
 date()
 ```
 
-    ## [1] "Sat Apr 13 15:15:28 2019"
+    ## [1] "Sat Apr 13 18:20:12 2019"
 
 ``` r
 t1 = paste(mname,'trainingM data')
-print(DoubleDensityPlot(treatedTrainP, mname, yName, 
+print(DoubleDensityPlot(trainPlot, mname, yName, 
                         title=t1))
 ```
 
 ![](KDD2009enc_files/figure-markdown_github/kddplot-1.png)
 
 ``` r
-print(ROCPlot(treatedTrainP, mname, yName, yTarget,
+print(ROCPlot(trainPlot, mname, yName, yTarget,
               title=t1))
 ```
 
 ![](KDD2009enc_files/figure-markdown_github/kddplot-2.png)
 
 ``` r
-print(WVPlots::PRPlot(treatedTrainP, mname, yName, yTarget,
+print(WVPlots::PRPlot(trainPlot, mname, yName, yTarget,
               title=t1))
 ```
 
@@ -421,21 +418,21 @@ print(WVPlots::PRPlot(treatedTrainP, mname, yName, yTarget,
 
 ``` r
 t2 = paste(mname,'test data')
-print(DoubleDensityPlot(treatedTestP, mname, yName, 
+print(DoubleDensityPlot(testPlot, mname, yName, 
                         title=t2))
 ```
 
 ![](KDD2009enc_files/figure-markdown_github/kddplot-4.png)
 
 ``` r
-print(ROCPlot(treatedTestP, mname, yName, yTarget,
+print(ROCPlot(testPlot, mname, yName, yTarget,
               title=t2))
 ```
 
 ![](KDD2009enc_files/figure-markdown_github/kddplot-5.png)
 
 ``` r
-print(WVPlots::PRPlot(treatedTestP, mname, yName, yTarget,
+print(WVPlots::PRPlot(testPlot, mname, yName, yTarget,
               title=t2))
 ```
 
@@ -445,7 +442,7 @@ print(WVPlots::PRPlot(treatedTestP, mname, yName, yTarget,
 print(date())
 ```
 
-    ## [1] "Sat Apr 13 15:15:30 2019"
+    ## [1] "Sat Apr 13 18:20:14 2019"
 
 ``` r
 print("*****************************")
@@ -457,7 +454,17 @@ print("*****************************")
 date()
 ```
 
-    ## [1] "Sat Apr 13 15:15:30 2019"
+    ## [1] "Sat Apr 13 18:20:14 2019"
+
+``` r
+WVPlots::ROCPlotPair(testPlot, 
+                     "glmnet_pred", "glmnet_pred_CVRTS",
+                     yName, yTarget, "ROC on test",
+                     estimate_sig = TRUE,
+                     parallelCluster = cl)
+```
+
+![](KDD2009enc_files/figure-markdown_github/compare-1.png)
 
 ``` r
 if(!is.null(cl)) {
