@@ -57,6 +57,8 @@ yTarget <- 1
 trainPlot = dTrain[, yName, drop=FALSE]
 testPlot = dTest[, yName, drop=FALSE]
 
+alpha = 0.5
+
 date()
 ```
 
@@ -105,8 +107,10 @@ date()
 mname = 'glmnet_pred'
 print(paste(mname,length(selvars)))
 
-model <- cv.glmnet(as.matrix(treatedTrainM[, selvars, drop = FALSE]),
+model <- 
+  glmnet(as.matrix(treatedTrainM[, selvars, drop = FALSE]),
                    treatedTrainM[[yName]]==yTarget,
+                   alpha = alpha,
                    family = "binomial")
 trainPlot[[mname]] = as.numeric(predict(
   model, 
@@ -235,6 +239,7 @@ print(paste(mname,length(selvars)))
 
 model <- cv.glmnet(as.matrix(treatedTrainM[, selvars, drop = FALSE]),
                    treatedTrainM[[yName]]==yTarget,
+                   alpha = alpha,
                    family = "binomial")
 trainPlot[[mname]] = as.numeric(predict(
   model, 
