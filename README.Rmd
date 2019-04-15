@@ -29,6 +29,7 @@ The idea is an extension of the [`vtreat`](https://github.com/WinVector/vtreat) 
 
 ```{r example}
 library("CVRTSEncoder")
+library("wrapr")
 
 data <- iris
 avars <- c("Sepal.Length", "Petal.Length")
@@ -38,6 +39,8 @@ dep_target <- "versicolor"
 for(vi in evars) {
   data[[vi]] <- as.character(round(data[[vi]]))
 }
+str(data)
+
 cross_enc <- estimate_residual_encoding_c(
   data = data,
   avars = avars,
@@ -49,8 +52,13 @@ cross_enc <- estimate_residual_encoding_c(
 )
 enc <- prepare(cross_enc$coder, data)
 data <- cbind(data, enc)
+data %.>%
+  head(.) %.>% 
+  knitr::kable(.)
 
 f0 <- wrapr::mk_formula(dep_var, avars, outcome_target = dep_target)
+print(f0)
+
 model0 <- glm(f0, data = data, family = binomial)
 summary(model0)
 
@@ -59,6 +67,8 @@ table(data$Species, data$pred0>0.5)
 
 newvars <- c(avars, colnames(enc))
 f <- wrapr::mk_formula(dep_var, newvars, outcome_target = dep_target)
+print(f)
+
 model <- glm(f, data = data, family = binomial)
 summary(model)
 

@@ -15,6 +15,7 @@ The idea is an extension of the [`vtreat`](https://github.com/WinVector/vtreat) 
 
 ``` r
 library("CVRTSEncoder")
+library("wrapr")
 
 data <- iris
 avars <- c("Sepal.Length", "Petal.Length")
@@ -24,6 +25,14 @@ dep_target <- "versicolor"
 for(vi in evars) {
   data[[vi]] <- as.character(round(data[[vi]]))
 }
+str(data)
+ #  'data.frame':   150 obs. of  5 variables:
+ #   $ Sepal.Length: num  5.1 4.9 4.7 4.6 5 5.4 4.6 5 4.4 4.9 ...
+ #   $ Sepal.Width : chr  "4" "3" "3" "3" ...
+ #   $ Petal.Length: num  1.4 1.4 1.3 1.5 1.4 1.7 1.4 1.5 1.4 1.5 ...
+ #   $ Petal.Width : chr  "0" "0" "0" "0" ...
+ #   $ Species     : Factor w/ 3 levels "setosa","versicolor",..: 1 1 1 1 1 1 1 1 1 1 ...
+
 cross_enc <- estimate_residual_encoding_c(
   data = data,
   avars = avars,
@@ -35,8 +44,27 @@ cross_enc <- estimate_residual_encoding_c(
 )
 enc <- prepare(cross_enc$coder, data)
 data <- cbind(data, enc)
+data %.>%
+  head(.) %.>% 
+  knitr::kable(.)
+```
+
+|  Sepal.Length| Sepal.Width |  Petal.Length| Petal.Width | Species |      c\_001|      c\_002|      c\_003|      c\_004|
+|-------------:|:------------|-------------:|:------------|:--------|-----------:|-----------:|-----------:|-----------:|
+|           5.1| 4           |           1.4| 0           | setosa  |  -0.7471080|  -0.4584132|   0.0593512|  -0.0049103|
+|           4.9| 3           |           1.4| 0           | setosa  |  -0.6021979|   0.1817913|  -0.0277118|   0.0345896|
+|           4.7| 3           |           1.3| 0           | setosa  |  -0.6021979|   0.1817913|  -0.0277118|   0.0345896|
+|           4.6| 3           |           1.5| 0           | setosa  |  -0.6021979|   0.1817913|  -0.0277118|   0.0345896|
+|           5.0| 4           |           1.4| 0           | setosa  |  -0.7471080|  -0.4584132|   0.0593512|  -0.0049103|
+|           5.4| 4           |           1.7| 0           | setosa  |  -0.7471080|  -0.4584132|   0.0593512|  -0.0049103|
+
+``` r
 
 f0 <- wrapr::mk_formula(dep_var, avars, outcome_target = dep_target)
+print(f0)
+ #  (Species == "versicolor") ~ Sepal.Length + Petal.Length
+ #  <environment: base>
+
 model0 <- glm(f0, data = data, family = binomial)
 summary(model0)
  #  
@@ -73,6 +101,11 @@ table(data$Species, data$pred0>0.5)
 
 newvars <- c(avars, colnames(enc))
 f <- wrapr::mk_formula(dep_var, newvars, outcome_target = dep_target)
+print(f)
+ #  (Species == "versicolor") ~ Sepal.Length + Petal.Length + c_001 + 
+ #      c_002 + c_003 + c_004
+ #  <environment: base>
+
 model <- glm(f, data = data, family = binomial)
  #  Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
 summary(model)
@@ -86,13 +119,13 @@ summary(model)
  #  
  #  Coefficients:
  #                 Estimate Std. Error z value Pr(>|z|)   
- #  (Intercept)  -3.766e+00  2.283e+06   0.000  1.00000   
+ #  (Intercept)  -3.744e+00  2.283e+06   0.000  1.00000   
  #  Sepal.Length  3.507e+00  1.665e+00   2.106  0.03517 * 
  #  Petal.Length -1.170e+01  3.770e+00  -3.103  0.00191 **
- #  c_001         5.134e+01  1.876e+06   0.000  0.99998   
- #  c_002         1.614e+02  1.207e+07   0.000  0.99999   
- #  c_003        -2.305e+02  2.642e+07   0.000  0.99999   
- #  c_004        -1.262e+03  4.229e+06   0.000  0.99976   
+ #  c_001         4.772e+01  2.640e+06   0.000  0.99999   
+ #  c_002         2.006e+02  1.685e+07   0.000  0.99999   
+ #  c_003        -3.462e+02  2.394e+07   0.000  0.99999   
+ #  c_004        -1.025e+03  4.204e+06   0.000  0.99981   
  #  ---
  #  Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
  #  
