@@ -1,12 +1,9 @@
 
-
-#' @importFrom parallel detectCores
-#' @importFrom stats predict
-#' @importFrom xgboost xgb.cv
+#' @importFrom glmnet glmnet
 NULL
 
 
-#' Adapt xgboost to a fit_predict() signature
+#' Adapt glmnet to a fit_predict() signature
 #'
 #' @param train_data data.frame training data.
 #' @param vars character vector, explanatory variable names.
@@ -31,7 +28,7 @@ NULL
 #'   data[[dep_var]]==dep_target)
 #' train_data <- data[xval[[1]]$train, , drop = FALSE]
 #' application_data <- data[xval[[1]]$app, , drop = FALSE]
-#' preds <- xgboost_fit_predict_c(
+#' preds <- glmnet_fit_predict_c(
 #'   train_data = train_data,
 #'   vars = vars,
 #'   dep_var = dep_var,
@@ -40,19 +37,15 @@ NULL
 #'
 #' @export
 #'
-xgboost_fit_predict_c <- function(train_data,
-                                  vars,
-                                  dep_var,
-                                  dep_target,
-                                  application_data,
-                                  ...,
-                                  cl = NULL) {
+glmnet_fit_predict_c <- function(train_data,
+                                 vars,
+                                 dep_var,
+                                 dep_target,
+                                 application_data,
+                                 ...,
+                                 cl = NULL) {
   wrapr::stop_if_dot_args(substitute(list(...)),
-                          "xgboost_fit_predict_c")
-  ncore <- parallel::detectCores()
-  params <- list(max_depth = 5,
-                 objective = "binary:logistic",
-                 nthread = ncore)
+                          "glmnet_fit_predict_c")
   cfe <- vtreat::mkCrossFrameCExperiment(train_data,
                                          varlist = vars,
                                          outcomename = dep_var,
@@ -61,24 +54,20 @@ xgboost_fit_predict_c <- function(train_data,
                                          parallelCluster = cl)
   sf <- cfe$treatments$scoreFrame
   selvars <- sf$varName[sf$sig<1/nrow(sf)]
-  cv <- xgboost::xgb.cv(data = as.matrix(cfe$crossFrame[, selvars, drop = FALSE]),
-                           label = cfe$crossFrame[[dep_var]]==dep_target,
-                           nrounds = 100,
-                           params = params,
-                           nfold = 5,
-                           early_stopping_rounds = 5,
-                           verbose = FALSE)
-  nrounds <- cv$best_iteration
-  model <- xgboost::xgboost(data = as.matrix(cfe$crossFrame[, selvars, drop = FALSE]),
-                   label = cfe$crossFrame[[dep_var]]==dep_target,
-                   nrounds = nrounds,
-                   params = params,
-                   verbose = FALSE)
+  alpha = 0.5
+  if(length(selvars)<2) {
+    # TODO: special case code for too few vars
+    print("break")
+  }
+  cv <- glmnet::cv.glmnet(x = as.matrix(cfe$crossFrame[, selvars, drop = FALSE]),
+                          y = cfe$crossFrame[[dep_var]]==dep_target,
+                          family = "binomial",
+                          alpha = alpha)
   app_matrix <-  as.matrix(
     vtreat::prepare(cfe$treatments,
                     application_data,
                     varRestriction = selvars)[, selvars, drop = FALSE])
-  preds <- predict(model, newdata = app_matrix, ntree = nrounds)
+  preds <- predict(cv, newx = app_matrix, s = "lambda.min", type = "response")
   as.numeric(preds)
 }
 

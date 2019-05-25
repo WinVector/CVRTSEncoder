@@ -104,8 +104,8 @@ estimate_residual_encoding_c <- function(
   if(!is.function(fit_predict)) {
     stop("estimate_residual_encoding_c: fit_predict should be a function")
   }
-  # get raw residual trajectory of from the model
-  resids <- calculate_residual_classification_trajectory(
+  # get raw augment target trajectory of from the model
+  augment_targets <- calculate_residual_classification_trajectory(
     data = data,
     fit_predict = fit_predict,
     vars = avars,
@@ -114,7 +114,7 @@ estimate_residual_encoding_c <- function(
     cross_plan = cross_plan,
     cl = cl)
   # y-aware encode
-  nresid <- ncol(resids)
+  nresid <- ncol(augment_targets)
   codes_by_var <- list()
   cross_frame <- data.frame(x = numeric(nrow(data)))
   cross_frame$x <- NULL
@@ -122,7 +122,7 @@ estimate_residual_encoding_c <- function(
     var <- stomp_cat_column(data[[vn]])
     codes <- list()
     for(j in seq_len(nresid)) {
-      y <- resids[, j, drop = TRUE]
+      y <- augment_targets[, j, drop = TRUE]
       code_name <- paste(vn, j, sep = "_")
       codes[[code_name]] <- table_col(var, y)
       enc <- numeric(length(y))

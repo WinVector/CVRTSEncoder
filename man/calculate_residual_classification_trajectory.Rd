@@ -7,7 +7,8 @@
 calculate_residual_classification_trajectory(data, fit_predict, vars, ...,
   dep_var, dep_target = TRUE,
   cross_plan = vtreat::kWayStratifiedY(nrow(data), 3, data,
-  data[[dep_var]] == dep_target), cl = NULL)
+  data[[dep_var]] == dep_target), fitter = xgboost_fit_predict_c,
+  cl = NULL)
 }
 \arguments{
 \item{data}{The data.frame of data to fit.}
@@ -24,6 +25,8 @@ calculate_residual_classification_trajectory(data, fit_predict, vars, ...,
 
 \item{cross_plan}{a vtreat-style cross validation plan for data rows (list of disjoint tran/app lists where app partitions the data rows).}
 
+\item{fitter}{fit/predict signature function}
+
 \item{cl}{parallel cluster for processing}
 }
 \value{
@@ -39,7 +42,7 @@ vars <- c("Sepal.Length", "Petal.Length",
           "Sepal.Width", "Petal.Width")
 dep_var <- "Species"
 dep_target <- "versicolor"
-resids <- calculate_residual_classification_trajectory(
+augments <- calculate_residual_classification_trajectory(
   data = data,
   vars = vars,
   fit_predict = xgboost_fit_predict_c,

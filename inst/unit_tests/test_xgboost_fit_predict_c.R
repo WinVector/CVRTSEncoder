@@ -13,13 +13,13 @@ test_operators <- function() {
     data[[dep_var]]==dep_target)
   train_data <- data[xval[[1]]$train, , drop = FALSE]
   application_data <- data[xval[[1]]$app, , drop = FALSE]
-  resids <- xgboost_fit_predict_c(
+  preds <- xgboost_fit_predict_c(
     train_data = train_data,
     vars = vars,
     dep_var = dep_var,
     dep_target = dep_target,
     application_data = application_data)
-  RUnit::checkTrue(is.matrix(resids))
+  RUnit::checkTrue(is.numeric(preds))
 
   invisible(NULL)
 }
