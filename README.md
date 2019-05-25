@@ -4,6 +4,9 @@
 [`CVRTSEncoder`](https://github.com/WinVector/CVRTSEncoder) is a
 categorical variable encoding for supervised learning.
 
+This package is still in a research and development mode. Functionality
+and interfaces may change.
+
 Re-encode a set of categorical variables jointly as a spectral
 projection of the trajectory of modeling residuals. This is intended as
 a succinct numeric linear representation of a set of categorical
@@ -70,12 +73,12 @@ data %.>%
 
 | Sepal.Length | Sepal.Width | Petal.Length | Petal.Width | Species |     c\_001 |      c\_002 |      c\_003 |      c\_004 |
 | -----------: | :---------- | -----------: | :---------- | :------ | ---------: | ----------: | ----------: | ----------: |
-|          5.1 | 4           |          1.4 | 0           | setosa  | \-1.728808 |   1.0609191 | \-0.0152318 | \-0.0750118 |
-|          4.9 | 3           |          1.4 | 0           | setosa  | \-1.377114 | \-0.3953607 | \-0.1182516 | \-0.0072902 |
-|          4.7 | 3           |          1.3 | 0           | setosa  | \-1.377114 | \-0.3953607 | \-0.1182516 | \-0.0072902 |
-|          4.6 | 3           |          1.5 | 0           | setosa  | \-1.377114 | \-0.3953607 | \-0.1182516 | \-0.0072902 |
-|          5.0 | 4           |          1.4 | 0           | setosa  | \-1.728808 |   1.0609191 | \-0.0152318 | \-0.0750118 |
-|          5.4 | 4           |          1.7 | 0           | setosa  | \-1.728808 |   1.0609191 | \-0.0152318 | \-0.0750118 |
+|          5.1 | 4           |          1.4 | 0           | setosa  | \-1.365860 |   0.7453766 |   0.2330156 |   0.0150437 |
+|          4.9 | 3           |          1.4 | 0           | setosa  | \-1.081897 | \-0.2983824 | \-0.0827264 | \-0.0822666 |
+|          4.7 | 3           |          1.3 | 0           | setosa  | \-1.081897 | \-0.2983824 | \-0.0827264 | \-0.0822666 |
+|          4.6 | 3           |          1.5 | 0           | setosa  | \-1.081897 | \-0.2983824 | \-0.0827264 | \-0.0822666 |
+|          5.0 | 4           |          1.4 | 0           | setosa  | \-1.365860 |   0.7453766 |   0.2330156 |   0.0150437 |
+|          5.4 | 4           |          1.7 | 0           | setosa  | \-1.365860 |   0.7453766 |   0.2330156 |   0.0150437 |
 
 ``` r
 
@@ -138,13 +141,13 @@ summary(model)
  #  
  #  Coefficients:
  #                 Estimate Std. Error z value Pr(>|z|)   
- #  (Intercept)  -3.751e+00  2.283e+06   0.000  1.00000   
+ #  (Intercept)  -3.758e+00  2.283e+06   0.000  1.00000   
  #  Sepal.Length  3.507e+00  1.665e+00   2.106  0.03517 * 
  #  Petal.Length -1.170e+01  3.770e+00  -3.103  0.00191 **
- #  c_001         1.355e+01  2.027e+06   0.000  0.99999   
- #  c_002        -4.421e+01  2.159e+06   0.000  0.99998   
- #  c_003         8.422e+01  4.059e+07   0.000  1.00000   
- #  c_004         9.540e+02  7.949e+07   0.000  0.99999   
+ #  c_001         2.788e+01  1.437e+06   0.000  0.99998   
+ #  c_002        -4.799e+01  4.336e+06   0.000  0.99999   
+ #  c_003        -3.202e+02  2.514e+07   0.000  0.99999   
+ #  c_004         3.493e+02  5.641e+06   0.000  0.99995   
  #  ---
  #  Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
  #  

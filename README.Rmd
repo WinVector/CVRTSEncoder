@@ -16,6 +16,8 @@ knitr::opts_chunk$set(
 
 [`CVRTSEncoder`](https://github.com/WinVector/CVRTSEncoder) is a categorical variable encoding for supervised learning.
 
+This package is still in a research and development mode.  Functionality and interfaces may change.
+
 Re-encode a set of categorical variables jointly as a spectral projection of the trajectory of modeling residuals.  This is intended as a succinct numeric linear representation of a set of categorical variables in a manner that is useful for supervised learning.
 
 The concept is y-aware encoding the trajectory of non-linear model residuals in terms of target categorical variables.
