@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Adapt xgboost to a fit_predict() signature — xgboost_fit_predict_c • CVRTSEncoder</title>
+<title>Adapt glmnet to a fit_predict() signature — glmnet_fit_predict_c • CVRTSEncoder</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -30,9 +30,9 @@
 
 
 
-<meta property="og:title" content="Adapt xgboost to a fit_predict() signature — xgboost_fit_predict_c" />
+<meta property="og:title" content="Adapt glmnet to a fit_predict() signature — glmnet_fit_predict_c" />
 
-<meta property="og:description" content="Adapt xgboost to a fit_predict() signature" />
+<meta property="og:description" content="Adapt glmnet to a fit_predict() signature" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -111,18 +111,18 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Adapt xgboost to a fit_predict() signature</h1>
-    <small class="dont-index">Source: <a href='https://github.com/WinVector/CVRTSEncoder/blob/master/R/xgboost_fit_predict_c.R'><code>R/xgboost_fit_predict_c.R</code></a></small>
-    <div class="hidden name"><code>xgboost_fit_predict_c.Rd</code></div>
+    <h1>Adapt glmnet to a fit_predict() signature</h1>
+    <small class="dont-index">Source: <a href='https://github.com/WinVector/CVRTSEncoder/blob/master/R/glmnet_fit_predict_c.R'><code>R/glmnet_fit_predict_c.R</code></a></small>
+    <div class="hidden name"><code>glmnet_fit_predict_c.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Adapt xgboost to a fit_predict() signature</p>
+    <p>Adapt glmnet to a fit_predict() signature</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>xgboost_fit_predict_c</span>(<span class='no'>train_data</span>, <span class='no'>vars</span>, <span class='no'>dep_var</span>, <span class='no'>dep_target</span>,
+    <pre class="usage"><span class='fu'>glmnet_fit_predict_c</span>(<span class='no'>train_data</span>, <span class='no'>vars</span>, <span class='no'>dep_var</span>, <span class='no'>dep_target</span>,
   <span class='no'>application_data</span>, <span class='no'>...</span>, <span class='kw'>cl</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -177,7 +177,7 @@
   <span class='no'>data</span><span class='kw'>[[</span><span class='no'>dep_var</span>]]<span class='kw'>==</span><span class='no'>dep_target</span>)
 <span class='no'>train_data</span> <span class='kw'>&lt;-</span> <span class='no'>data</span>[<span class='no'>xval</span><span class='kw'>[[</span><span class='fl'>1</span>]]$<span class='no'>train</span>, , <span class='kw'>drop</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>]
 <span class='no'>application_data</span> <span class='kw'>&lt;-</span> <span class='no'>data</span>[<span class='no'>xval</span><span class='kw'>[[</span><span class='fl'>1</span>]]$<span class='no'>app</span>, , <span class='kw'>drop</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>]
-<span class='no'>preds</span> <span class='kw'>&lt;-</span> <span class='fu'>xgboost_fit_predict_c</span>(
+<span class='no'>preds</span> <span class='kw'>&lt;-</span> <span class='fu'>glmnet_fit_predict_c</span>(
   <span class='kw'>train_data</span> <span class='kw'>=</span> <span class='no'>train_data</span>,
   <span class='kw'>vars</span> <span class='kw'>=</span> <span class='no'>vars</span>,
   <span class='kw'>dep_var</span> <span class='kw'>=</span> <span class='no'>dep_var</span>,

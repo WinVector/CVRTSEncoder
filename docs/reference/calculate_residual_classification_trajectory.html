@@ -32,7 +32,8 @@
 
 <meta property="og:title" content="Build residual classification trajectory. — calculate_residual_classification_trajectory" />
 
-<meta property="og:description" content="Build a cross-validated residual trajectory for a model." />
+<meta property="og:description" content="Build a cross-validated residual trajectory for a model.  The core idea is: other models factor the quantity to be explained into
+an explainable versus residual portion (with respect to the given model).  Each of these components are possibly useful for modeling." />
 <meta name="twitter:card" content="summary" />
 
 
@@ -118,14 +119,16 @@
 
     <div class="ref-description">
     
-    <p>Build a cross-validated residual trajectory for a model.</p>
+    <p>Build a cross-validated residual trajectory for a model.  The core idea is: other models factor the quantity to be explained into
+an explainable versus residual portion (with respect to the given model).  Each of these components are possibly useful for modeling.</p>
     
     </div>
 
     <pre class="usage"><span class='fu'>calculate_residual_classification_trajectory</span>(<span class='no'>data</span>, <span class='no'>fit_predict</span>, <span class='no'>vars</span>, <span class='no'>...</span>,
   <span class='no'>dep_var</span>, <span class='kw'>dep_target</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>,
   <span class='kw'>cross_plan</span> <span class='kw'>=</span> <span class='kw pkg'>vtreat</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/vtreat/topics/kWayStratifiedY'>kWayStratifiedY</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>nrow</a></span>(<span class='no'>data</span>), <span class='fl'>3</span>, <span class='no'>data</span>,
-  <span class='no'>data</span><span class='kw'>[[</span><span class='no'>dep_var</span>]] <span class='kw'>==</span> <span class='no'>dep_target</span>), <span class='kw'>cl</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+  <span class='no'>data</span><span class='kw'>[[</span><span class='no'>dep_var</span>]] <span class='kw'>==</span> <span class='no'>dep_target</span>), <span class='kw'>fitter</span> <span class='kw'>=</span> <span class='no'>xgboost_fit_predict_c</span>,
+  <span class='kw'>cl</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -159,6 +162,10 @@
       <td><p>a vtreat-style cross validation plan for data rows (list of disjoint tran/app lists where app partitions the data rows).</p></td>
     </tr>
     <tr>
+      <th>fitter</th>
+      <td><p>fit/predict signature function</p></td>
+    </tr>
+    <tr>
       <th>cl</th>
       <td><p>parallel cluster for processing</p></td>
     </tr>
@@ -176,7 +183,7 @@
           <span class='st'>"Sepal.Width"</span>, <span class='st'>"Petal.Width"</span>)
 <span class='no'>dep_var</span> <span class='kw'>&lt;-</span> <span class='st'>"Species"</span>
 <span class='no'>dep_target</span> <span class='kw'>&lt;-</span> <span class='st'>"versicolor"</span>
-<span class='no'>resids</span> <span class='kw'>&lt;-</span> <span class='fu'>calculate_residual_classification_trajectory</span>(
+<span class='no'>augments</span> <span class='kw'>&lt;-</span> <span class='fu'>calculate_residual_classification_trajectory</span>(
   <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>data</span>,
   <span class='kw'>vars</span> <span class='kw'>=</span> <span class='no'>vars</span>,
   <span class='kw'>fit_predict</span> <span class='kw'>=</span> <span class='no'>xgboost_fit_predict_c</span>,
