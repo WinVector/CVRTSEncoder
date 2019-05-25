@@ -5,7 +5,7 @@ output: github_document
 ---
 
 
-KDD2009 example using the `vtreat` `R` package.
+KDD2009 example using the [`CVRTSEncoder`](https://github.com/WinVector/CVRTSEncoder) `R` package.
 
 
 ```{r kddexlibs, tidy=FALSE}
@@ -19,7 +19,7 @@ library('parallel')
 library("glmnet")
 
 
-dir = "../../PDSwR2/KDD2009/"
+dir = "../../PracticalDataScienceWithR2nd/PDSwR2/KDD2009/"
 
 
 d <- read.table(paste(dir, 'orange_small_train.data.gz', sep = "/"), 
@@ -108,7 +108,7 @@ mname = 'glmnet_pred'
 print(paste(mname,length(selvars)))
 
 model <- 
-  glmnet(as.matrix(treatedTrainM[, selvars, drop = FALSE]),
+  cv.glmnet(as.matrix(treatedTrainM[, selvars, drop = FALSE]),
                    treatedTrainM[[yName]]==yTarget,
                    alpha = alpha,
                    family = "binomial")

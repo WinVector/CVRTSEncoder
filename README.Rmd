@@ -20,7 +20,7 @@ Re-encode a set of categorical variables jointly as a spectral projection of the
 
 The concept is y-aware encoding the trajectory of non-linear model residuals in terms of target categorical variables.
 
-The idea is an extension of the [`vtreat`](https://github.com/WinVector/vtreat) coding [concepts](https://github.com/WinVector/vtreat/blob/master/extras/vtreat.pdf) and of the y-aware scaling concepts of Nina Zumel and John Mount:
+The idea is an extension of the [`vtreat`](https://github.com/WinVector/vtreat) coding [concepts](https://github.com/WinVector/vtreat/blob/master/extras/vtreat.pdf), the re-encoding concepts of [JavaLogistic](https://github.com/WinVector/Logistic), and of the y-aware scaling concepts of Nina Zumel and John Mount:
 
   * [Principal Components Regression, Pt.1: The Standard Method](http://www.win-vector.com/blog/2016/05/pcr_part1_xonly/)
   * [Principal Components Regression, Pt. 2: Y-Aware Methods](http://www.win-vector.com/blog/2016/05/pcr_part2_yaware/)

@@ -1,17 +1,34 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-[`CVRTSEncoder`](https://github.com/WinVector/CVRTSEncoder) is a categorical variable encoding for supervised learning.
 
-Re-encode a set of categorical variables jointly as a spectral projection of the trajectory of modeling residuals. This is intended as a succinct numeric linear representation of a set of categorical variables in a manner that is useful for supervised learning.
+[`CVRTSEncoder`](https://github.com/WinVector/CVRTSEncoder) is a
+categorical variable encoding for supervised learning.
 
-The concept is y-aware encoding the trajectory of non-linear model residuals in terms of target categorical variables.
+Re-encode a set of categorical variables jointly as a spectral
+projection of the trajectory of modeling residuals. This is intended as
+a succinct numeric linear representation of a set of categorical
+variables in a manner that is useful for supervised learning.
 
-The idea is an extension of the [`vtreat`](https://github.com/WinVector/vtreat) coding [concepts](https://github.com/WinVector/vtreat/blob/master/extras/vtreat.pdf) and of the y-aware scaling concepts of Nina Zumel and John Mount:
+The concept is y-aware encoding the trajectory of non-linear model
+residuals in terms of target categorical variables.
 
--   [Principal Components Regression, Pt.1: The Standard Method](http://www.win-vector.com/blog/2016/05/pcr_part1_xonly/)
--   [Principal Components Regression, Pt. 2: Y-Aware Methods](http://www.win-vector.com/blog/2016/05/pcr_part2_yaware/)
--   [Principal Components Regression, Pt. 3: Picking the Number of Components](http://www.win-vector.com/blog/2016/05/pcr_part3_pickk/)
--   [y-aware scaling in context](http://www.win-vector.com/blog/2016/06/y-aware-scaling-in-context/).
+The idea is an extension of the
+[`vtreat`](https://github.com/WinVector/vtreat) coding
+[concepts](https://github.com/WinVector/vtreat/blob/master/extras/vtreat.pdf),
+the re-encoding concepts of
+[JavaLogistic](https://github.com/WinVector/Logistic), and of the
+y-aware scaling concepts of Nina Zumel and John Mount:
+
+  - [Principal Components Regression, Pt.1: The Standard
+    Method](http://www.win-vector.com/blog/2016/05/pcr_part1_xonly/)
+  - [Principal Components Regression, Pt. 2: Y-Aware
+    Methods](http://www.win-vector.com/blog/2016/05/pcr_part2_yaware/)
+  - [Principal Components Regression, Pt. 3: Picking the Number of
+    Components](http://www.win-vector.com/blog/2016/05/pcr_part3_pickk/)
+  - [y-aware scaling in
+    context](http://www.win-vector.com/blog/2016/06/y-aware-scaling-in-context/).
+
+<!-- end list -->
 
 ``` r
 library("CVRTSEncoder")
@@ -49,14 +66,14 @@ data %.>%
   knitr::kable(.)
 ```
 
-|  Sepal.Length| Sepal.Width |  Petal.Length| Petal.Width | Species |      c\_001|      c\_002|      c\_003|      c\_004|
-|-------------:|:------------|-------------:|:------------|:--------|-----------:|-----------:|-----------:|-----------:|
-|           5.1| 4           |           1.4| 0           | setosa  |  -0.7471080|  -0.4584132|   0.0593512|  -0.0049103|
-|           4.9| 3           |           1.4| 0           | setosa  |  -0.6021979|   0.1817913|  -0.0277118|   0.0345896|
-|           4.7| 3           |           1.3| 0           | setosa  |  -0.6021979|   0.1817913|  -0.0277118|   0.0345896|
-|           4.6| 3           |           1.5| 0           | setosa  |  -0.6021979|   0.1817913|  -0.0277118|   0.0345896|
-|           5.0| 4           |           1.4| 0           | setosa  |  -0.7471080|  -0.4584132|   0.0593512|  -0.0049103|
-|           5.4| 4           |           1.7| 0           | setosa  |  -0.7471080|  -0.4584132|   0.0593512|  -0.0049103|
+| Sepal.Length | Sepal.Width | Petal.Length | Petal.Width | Species |     c\_001 |      c\_002 |    c\_003 |      c\_004 |
+| -----------: | :---------- | -----------: | :---------- | :------ | ---------: | ----------: | --------: | ----------: |
+|          5.1 | 4           |          1.4 | 0           | setosa  | \-1.606435 | \-0.9692454 | 0.1080118 |   0.0864435 |
+|          4.9 | 3           |          1.4 | 0           | setosa  | \-1.284676 |   0.3476765 | 0.1592109 | \-0.0837828 |
+|          4.7 | 3           |          1.3 | 0           | setosa  | \-1.284676 |   0.3476765 | 0.1592109 | \-0.0837828 |
+|          4.6 | 3           |          1.5 | 0           | setosa  | \-1.284676 |   0.3476765 | 0.1592109 | \-0.0837828 |
+|          5.0 | 4           |          1.4 | 0           | setosa  | \-1.606435 | \-0.9692454 | 0.1080118 |   0.0864435 |
+|          5.4 | 4           |          1.7 | 0           | setosa  | \-1.606435 | \-0.9692454 | 0.1080118 |   0.0864435 |
 
 ``` r
 
@@ -119,13 +136,13 @@ summary(model)
  #  
  #  Coefficients:
  #                 Estimate Std. Error z value Pr(>|z|)   
- #  (Intercept)  -3.744e+00  2.283e+06   0.000  1.00000   
+ #  (Intercept)  -3.766e+00  2.283e+06   0.000  1.00000   
  #  Sepal.Length  3.507e+00  1.665e+00   2.106  0.03517 * 
  #  Petal.Length -1.170e+01  3.770e+00  -3.103  0.00191 **
- #  c_001         4.772e+01  2.640e+06   0.000  0.99999   
- #  c_002         2.006e+02  1.685e+07   0.000  0.99999   
- #  c_003        -3.462e+02  2.394e+07   0.000  0.99999   
- #  c_004        -1.025e+03  4.204e+06   0.000  0.99981   
+ #  c_001         1.425e+01  5.566e+05   0.000  0.99998   
+ #  c_002         9.272e+00  7.262e+03   0.001  0.99898   
+ #  c_003        -4.204e+02  2.628e+07   0.000  0.99999   
+ #  c_004        -7.630e+02  8.576e+07   0.000  0.99999   
  #  ---
  #  Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
  #  
