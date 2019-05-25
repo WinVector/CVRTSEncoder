@@ -33,7 +33,8 @@ calculate_residual_classification_trajectory(data, fit_predict, vars, ...,
 a matrix with the same number of rows as data representing the cross-validated modeling residual trajectories.
 }
 \description{
-Build a cross-validated residual trajectory for a model.
+Build a cross-validated residual trajectory for a model.  The core idea is: other models factor the quantity to be explained into
+an explainable versus residual portion (with respect to the given model).  Each of these components are possibly useful for modeling.
 }
 \examples{
 

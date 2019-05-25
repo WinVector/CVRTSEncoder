@@ -15,7 +15,8 @@ to_resid <- function(p, target) {
 
 #' Build residual classification trajectory.
 #'
-#' Build a cross-validated residual trajectory for a model.
+#' Build a cross-validated residual trajectory for a model.  The core idea is: other models factor the quantity to be explained into
+#' an explainable versus residual portion (with respect to the given model).  Each of these components are possibly useful for modeling.
 #'
 #' @param data The data.frame of data to fit.
 #' @param fit_predict A function with signature fit_predict(train_data, vars, dep_var, dep_target, application_data) that returns a matrix with one row of predictions per row of appication_data, and an ordered set of columns of predictions.

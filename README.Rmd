@@ -26,6 +26,9 @@ The idea is an extension of the [`vtreat`](https://github.com/WinVector/vtreat) 
   * [Principal Components Regression, Pt. 2: Y-Aware Methods](http://www.win-vector.com/blog/2016/05/pcr_part2_yaware/)
   * [Principal Components Regression, Pt. 3: Picking the Number of Components](http://www.win-vector.com/blog/2016/05/pcr_part3_pickk/)
   * [y-aware scaling in context](http://www.win-vector.com/blog/2016/06/y-aware-scaling-in-context/).
+  
+  
+The core idea is: other models factor the quantity to be explained into an explainable versus residual portion (with respect to the given model).  Each of these components are possibly useful for modeling.
 
 ```{r example}
 library("CVRTSEncoder")
