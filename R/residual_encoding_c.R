@@ -36,7 +36,8 @@ map_col <- function(v, tab) {
 #'
 #' @param data The data.frame of data to fit.
 #' @param ... not used, force arguments to be bound by name
-#' @param fit_predict A function with signature fit_predict(train_data, vars, dep_var, dep_target, application_data) that returns a matrix with one row of predictions per row of appication_data, and an ordered set of columns of predictions.
+#' @param fit_predict_c A function with signature fit_predict_c(train_data, vars, dep_var, dep_target, application_data) that returns a matrix with one row of predictions per row of appication_data, and an ordered set of columns of predictions.
+#' @param fit_predict_r A function with signature fit_predict_r(train_data, vars, dep_var, application_data) that returns a matrix with one row of predictions per row of appication_data, and an ordered set of columns of predictions.
 #' @param evars character vector, categorical explanatory variable names to be encoded.
 #' @param avars character vector, additional explanatory variable names.
 #' @param dep_var character, the name of dependent variable.
@@ -60,7 +61,6 @@ map_col <- function(v, tab) {
 #'   data = data,
 #'   avars = avars,
 #'   evars = evars,
-#'   fit_predict = xgboost_fit_predict_c,
 #'   dep_var = dep_var,
 #'   dep_target = dep_target,
 #'   n_comp = 4
@@ -69,8 +69,9 @@ map_col <- function(v, tab) {
 #' data <- cbind(data, enc)
 #' newvars <- c(avars, colnames(enc))
 #' f <- wrapr::mk_formula(dep_var, newvars, outcome_target = dep_target)
-#' model <- glm(f, data = data, family = binomial)
-#' data$pred <- predict(model, newdata = data, type = "response")
+#' model <- glmnet::cv.glmnet(as.matrix(data[, newvars, drop = FALSE]), as.numeric(data[[dep_var]]==dep_target), family = "binomial")
+#' coef(model, lambda = "lambda.min")
+#' data$pred <- as.numeric(predict(model, newx = as.matrix(data[, newvars, drop = FALSE]), s = "lambda.min"))
 #' table(data$Species, data$pred>0.5)
 #'
 #' @export
@@ -78,7 +79,8 @@ map_col <- function(v, tab) {
 estimate_residual_encoding_c <- function(
   data,
   ...,
-  fit_predict = xgboost_fit_predict_c,
+  fit_predict_c = xgboost_fit_predict_c,
+  fit_predict_r = xgboost_fit_predict_r,
   evars,
   avars,
   dep_var,
@@ -101,13 +103,17 @@ estimate_residual_encoding_c <- function(
   if(!is.character(evars)) {
     stop("estimate_residual_encoding_c: evars should be character")
   }
-  if(!is.function(fit_predict)) {
-    stop("estimate_residual_encoding_c: fit_predict should be a function")
+  if(!is.function(fit_predict_c)) {
+    stop("estimate_residual_encoding_c: fit_predict_c should be a function")
+  }
+  if(!is.function(fit_predict_r)) {
+    stop("estimate_residual_encoding_c: fit_predict_r should be a function")
   }
   # get raw augment target trajectory of from the model
   augment_targets <- calculate_residual_classification_trajectory(
     data = data,
-    fit_predict = fit_predict,
+    fitter_c = fit_predict_c,
+    fitter_r = fit_predict_r,
     vars = avars,
     dep_var = dep_var,
     dep_target = dep_target,

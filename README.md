@@ -59,7 +59,6 @@ cross_enc <- estimate_residual_encoding_c(
   data = data,
   avars = avars,
   evars = evars,
-  fit_predict = xgboost_fit_predict_c,
   dep_var = dep_var,
   dep_target = dep_target,
   n_comp = 4
@@ -71,14 +70,14 @@ data %.>%
   knitr::kable(.)
 ```
 
-| Sepal.Length | Sepal.Width | Petal.Length | Petal.Width | Species |     c\_001 |      c\_002 |      c\_003 |      c\_004 |
-| -----------: | :---------- | -----------: | :---------- | :------ | ---------: | ----------: | ----------: | ----------: |
-|          5.1 | 4           |          1.4 | 0           | setosa  | \-1.365860 |   0.7453766 |   0.2330156 |   0.0150437 |
-|          4.9 | 3           |          1.4 | 0           | setosa  | \-1.081897 | \-0.2983824 | \-0.0827264 | \-0.0822666 |
-|          4.7 | 3           |          1.3 | 0           | setosa  | \-1.081897 | \-0.2983824 | \-0.0827264 | \-0.0822666 |
-|          4.6 | 3           |          1.5 | 0           | setosa  | \-1.081897 | \-0.2983824 | \-0.0827264 | \-0.0822666 |
-|          5.0 | 4           |          1.4 | 0           | setosa  | \-1.365860 |   0.7453766 |   0.2330156 |   0.0150437 |
-|          5.4 | 4           |          1.7 | 0           | setosa  | \-1.365860 |   0.7453766 |   0.2330156 |   0.0150437 |
+| Sepal.Length | Sepal.Width | Petal.Length | Petal.Width | Species |     c\_001 |    c\_002 |     c\_003 |      c\_004 |
+| -----------: | :---------- | -----------: | :---------- | :------ | ---------: | --------: | ---------: | ----------: |
+|          5.1 | 4           |          1.4 | 0           | setosa  | \-6.858432 | 1.8427407 | \-2.388919 |   0.0299307 |
+|          4.9 | 3           |          1.4 | 0           | setosa  | \-5.278981 | 0.3747432 |   2.706826 | \-0.2840527 |
+|          4.7 | 3           |          1.3 | 0           | setosa  | \-5.278981 | 0.3747432 |   2.706826 | \-0.2840527 |
+|          4.6 | 3           |          1.5 | 0           | setosa  | \-5.278981 | 0.3747432 |   2.706826 | \-0.2840527 |
+|          5.0 | 4           |          1.4 | 0           | setosa  | \-6.858432 | 1.8427407 | \-2.388919 |   0.0299307 |
+|          5.4 | 4           |          1.7 | 0           | setosa  | \-6.858432 | 1.8427407 | \-2.388919 |   0.0299307 |
 
 ``` r
 
@@ -128,42 +127,24 @@ print(f)
  #      c_002 + c_003 + c_004
  #  <environment: base>
 
-model <- glm(f, data = data, family = binomial)
- #  Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred
-summary(model)
- #  
- #  Call:
- #  glm(formula = f, family = binomial, data = data)
- #  
- #  Deviance Residuals: 
- #       Min        1Q    Median        3Q       Max  
- #  -1.44336  -0.01155   0.00000   0.00203   2.69526  
- #  
- #  Coefficients:
- #                 Estimate Std. Error z value Pr(>|z|)   
- #  (Intercept)  -3.758e+00  2.283e+06   0.000  1.00000   
- #  Sepal.Length  3.507e+00  1.665e+00   2.106  0.03517 * 
- #  Petal.Length -1.170e+01  3.770e+00  -3.103  0.00191 **
- #  c_001         2.788e+01  1.437e+06   0.000  0.99998   
- #  c_002        -4.799e+01  4.336e+06   0.000  0.99999   
- #  c_003        -3.202e+02  2.514e+07   0.000  0.99999   
- #  c_004         3.493e+02  5.641e+06   0.000  0.99995   
- #  ---
- #  Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
- #  
- #  (Dispersion parameter for binomial family taken to be 1)
- #  
- #      Null deviance: 190.954  on 149  degrees of freedom
- #  Residual deviance:  22.619  on 143  degrees of freedom
- #  AIC: 36.619
- #  
- #  Number of Fisher Scoring iterations: 21
-
-data$pred <- predict(model, newdata = data, type = "response")
+model <- glmnet::cv.glmnet(as.matrix(data[, newvars, drop = FALSE]), 
+                           as.numeric(data[[dep_var]]==dep_target), 
+                           family = "binomial")
+coef(model, lambda = "lambda.min")
+ #  7 x 1 sparse Matrix of class "dgCMatrix"
+ #                        1
+ #  (Intercept)   0.6076907
+ #  Sepal.Length  .        
+ #  Petal.Length -0.5206192
+ #  c_001         0.5398427
+ #  c_002        -0.9798759
+ #  c_003         .        
+ #  c_004         0.1553199
+data$pred <- as.numeric(predict(model, newx = as.matrix(data[, newvars, drop = FALSE]), s = "lambda.min"))
 table(data$Species, data$pred>0.5)
  #              
  #               FALSE TRUE
  #    setosa        50    0
- #    versicolor     3   47
- #    virginica     49    1
+ #    versicolor     4   46
+ #    virginica     50    0
 ```

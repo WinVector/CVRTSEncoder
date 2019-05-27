@@ -120,16 +120,15 @@
 <a class="sourceLine" id="cb1-21" data-line-number="21">  <span class="dt">data =</span> data,</a>
 <a class="sourceLine" id="cb1-22" data-line-number="22">  <span class="dt">avars =</span> avars,</a>
 <a class="sourceLine" id="cb1-23" data-line-number="23">  <span class="dt">evars =</span> evars,</a>
-<a class="sourceLine" id="cb1-24" data-line-number="24">  <span class="dt">fit_predict =</span> xgboost_fit_predict_c,</a>
-<a class="sourceLine" id="cb1-25" data-line-number="25">  <span class="dt">dep_var =</span> dep_var,</a>
-<a class="sourceLine" id="cb1-26" data-line-number="26">  <span class="dt">dep_target =</span> dep_target,</a>
-<a class="sourceLine" id="cb1-27" data-line-number="27">  <span class="dt">n_comp =</span> <span class="dv">4</span></a>
-<a class="sourceLine" id="cb1-28" data-line-number="28">)</a>
-<a class="sourceLine" id="cb1-29" data-line-number="29">enc &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/vtreat/topics/prepare">prepare</a></span>(cross_enc<span class="op">$</span>coder, data)</a>
-<a class="sourceLine" id="cb1-30" data-line-number="30">data &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/cbind">cbind</a></span>(data, enc)</a>
-<a class="sourceLine" id="cb1-31" data-line-number="31">data <span class="op">%.&gt;%</span></a>
-<a class="sourceLine" id="cb1-32" data-line-number="32"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/head">head</a></span>(.) <span class="op">%.&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb1-33" data-line-number="33"><span class="st">  </span>knitr<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/knitr/topics/kable">kable</a></span>(.)</a></code></pre></div>
+<a class="sourceLine" id="cb1-24" data-line-number="24">  <span class="dt">dep_var =</span> dep_var,</a>
+<a class="sourceLine" id="cb1-25" data-line-number="25">  <span class="dt">dep_target =</span> dep_target,</a>
+<a class="sourceLine" id="cb1-26" data-line-number="26">  <span class="dt">n_comp =</span> <span class="dv">4</span></a>
+<a class="sourceLine" id="cb1-27" data-line-number="27">)</a>
+<a class="sourceLine" id="cb1-28" data-line-number="28">enc &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/vtreat/topics/prepare">prepare</a></span>(cross_enc<span class="op">$</span>coder, data)</a>
+<a class="sourceLine" id="cb1-29" data-line-number="29">data &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/cbind">cbind</a></span>(data, enc)</a>
+<a class="sourceLine" id="cb1-30" data-line-number="30">data <span class="op">%.&gt;%</span></a>
+<a class="sourceLine" id="cb1-31" data-line-number="31"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/head">head</a></span>(.) <span class="op">%.&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb1-32" data-line-number="32"><span class="st">  </span>knitr<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/knitr/topics/kable">kable</a></span>(.)</a></code></pre></div>
 <table class="table table">
 <thead><tr class="header">
 <th align="right">Sepal.Length</th>
@@ -149,10 +148,10 @@
 <td align="right">1.4</td>
 <td align="left">0</td>
 <td align="left">setosa</td>
-<td align="right">-1.357490</td>
-<td align="right">-0.8361401</td>
-<td align="right">0.0357002</td>
-<td align="right">-0.0120086</td>
+<td align="right">-3.455236</td>
+<td align="right">-3.2690825</td>
+<td align="right">-1.819251</td>
+<td align="right">-0.2393309</td>
 </tr>
 <tr class="even">
 <td align="right">4.9</td>
@@ -160,10 +159,10 @@
 <td align="right">1.4</td>
 <td align="left">0</td>
 <td align="left">setosa</td>
-<td align="right">-1.099535</td>
-<td align="right">0.3007515</td>
-<td align="right">0.0244733</td>
-<td align="right">-0.0381004</td>
+<td align="right">-2.329880</td>
+<td align="right">-0.8594317</td>
+<td align="right">1.720161</td>
+<td align="right">-0.9665624</td>
 </tr>
 <tr class="odd">
 <td align="right">4.7</td>
@@ -171,10 +170,10 @@
 <td align="right">1.3</td>
 <td align="left">0</td>
 <td align="left">setosa</td>
-<td align="right">-1.099535</td>
-<td align="right">0.3007515</td>
-<td align="right">0.0244733</td>
-<td align="right">-0.0381004</td>
+<td align="right">-2.329880</td>
+<td align="right">-0.8594317</td>
+<td align="right">1.720161</td>
+<td align="right">-0.9665624</td>
 </tr>
 <tr class="even">
 <td align="right">4.6</td>
@@ -182,10 +181,10 @@
 <td align="right">1.5</td>
 <td align="left">0</td>
 <td align="left">setosa</td>
-<td align="right">-1.099535</td>
-<td align="right">0.3007515</td>
-<td align="right">0.0244733</td>
-<td align="right">-0.0381004</td>
+<td align="right">-2.329880</td>
+<td align="right">-0.8594317</td>
+<td align="right">1.720161</td>
+<td align="right">-0.9665624</td>
 </tr>
 <tr class="odd">
 <td align="right">5.0</td>
@@ -193,10 +192,10 @@
 <td align="right">1.4</td>
 <td align="left">0</td>
 <td align="left">setosa</td>
-<td align="right">-1.357490</td>
-<td align="right">-0.8361401</td>
-<td align="right">0.0357002</td>
-<td align="right">-0.0120086</td>
+<td align="right">-3.455236</td>
+<td align="right">-3.2690825</td>
+<td align="right">-1.819251</td>
+<td align="right">-0.2393309</td>
 </tr>
 <tr class="even">
 <td align="right">5.4</td>
@@ -204,10 +203,10 @@
 <td align="right">1.7</td>
 <td align="left">0</td>
 <td align="left">setosa</td>
-<td align="right">-1.357490</td>
-<td align="right">-0.8361401</td>
-<td align="right">0.0357002</td>
-<td align="right">-0.0120086</td>
+<td align="right">-3.455236</td>
+<td align="right">-3.2690825</td>
+<td align="right">-1.819251</td>
+<td align="right">-0.2393309</td>
 </tr>
 </tbody>
 </table>
@@ -258,44 +257,26 @@
 <a class="sourceLine" id="cb2-45" data-line-number="45"> <span class="co">#      c_002 + c_003 + c_004</span></a>
 <a class="sourceLine" id="cb2-46" data-line-number="46"> <span class="co">#  &lt;environment: base&gt;</span></a>
 <a class="sourceLine" id="cb2-47" data-line-number="47"></a>
-<a class="sourceLine" id="cb2-48" data-line-number="48">model &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/glm">glm</a></span>(f, <span class="dt">data =</span> data, <span class="dt">family =</span> binomial)</a>
-<a class="sourceLine" id="cb2-49" data-line-number="49"> <span class="co">#  Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</span></a>
-<a class="sourceLine" id="cb2-50" data-line-number="50"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/summary">summary</a></span>(model)</a>
-<a class="sourceLine" id="cb2-51" data-line-number="51"> <span class="co">#  </span></a>
-<a class="sourceLine" id="cb2-52" data-line-number="52"> <span class="co">#  Call:</span></a>
-<a class="sourceLine" id="cb2-53" data-line-number="53"> <span class="co">#  glm(formula = f, family = binomial, data = data)</span></a>
-<a class="sourceLine" id="cb2-54" data-line-number="54"> <span class="co">#  </span></a>
-<a class="sourceLine" id="cb2-55" data-line-number="55"> <span class="co">#  Deviance Residuals: </span></a>
-<a class="sourceLine" id="cb2-56" data-line-number="56"> <span class="co">#       Min        1Q    Median        3Q       Max  </span></a>
-<a class="sourceLine" id="cb2-57" data-line-number="57"> <span class="co">#  -1.44336  -0.01155   0.00000   0.00203   2.69526  </span></a>
-<a class="sourceLine" id="cb2-58" data-line-number="58"> <span class="co">#  </span></a>
-<a class="sourceLine" id="cb2-59" data-line-number="59"> <span class="co">#  Coefficients:</span></a>
-<a class="sourceLine" id="cb2-60" data-line-number="60"> <span class="co">#                 Estimate Std. Error z value Pr(&gt;|z|)   </span></a>
-<a class="sourceLine" id="cb2-61" data-line-number="61"> <span class="co">#  (Intercept)  -3.761e+00  2.283e+06   0.000  1.00000   </span></a>
-<a class="sourceLine" id="cb2-62" data-line-number="62"> <span class="co">#  Sepal.Length  3.507e+00  1.665e+00   2.106  0.03517 * </span></a>
-<a class="sourceLine" id="cb2-63" data-line-number="63"> <span class="co">#  Petal.Length -1.170e+01  3.770e+00  -3.103  0.00191 **</span></a>
-<a class="sourceLine" id="cb2-64" data-line-number="64"> <span class="co">#  c_001         8.638e+00  6.840e+04   0.000  0.99990   </span></a>
-<a class="sourceLine" id="cb2-65" data-line-number="65"> <span class="co">#  c_002         8.736e+01  8.320e+06   0.000  0.99999   </span></a>
-<a class="sourceLine" id="cb2-66" data-line-number="66"> <span class="co">#  c_003        -1.696e+03  1.494e+08   0.000  0.99999   </span></a>
-<a class="sourceLine" id="cb2-67" data-line-number="67"> <span class="co">#  c_004        -1.740e+02  8.826e+07   0.000  1.00000   </span></a>
-<a class="sourceLine" id="cb2-68" data-line-number="68"> <span class="co">#  ---</span></a>
-<a class="sourceLine" id="cb2-69" data-line-number="69"> <span class="co">#  Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</span></a>
-<a class="sourceLine" id="cb2-70" data-line-number="70"> <span class="co">#  </span></a>
-<a class="sourceLine" id="cb2-71" data-line-number="71"> <span class="co">#  (Dispersion parameter for binomial family taken to be 1)</span></a>
-<a class="sourceLine" id="cb2-72" data-line-number="72"> <span class="co">#  </span></a>
-<a class="sourceLine" id="cb2-73" data-line-number="73"> <span class="co">#      Null deviance: 190.954  on 149  degrees of freedom</span></a>
-<a class="sourceLine" id="cb2-74" data-line-number="74"> <span class="co">#  Residual deviance:  22.619  on 143  degrees of freedom</span></a>
-<a class="sourceLine" id="cb2-75" data-line-number="75"> <span class="co">#  AIC: 36.619</span></a>
-<a class="sourceLine" id="cb2-76" data-line-number="76"> <span class="co">#  </span></a>
-<a class="sourceLine" id="cb2-77" data-line-number="77"> <span class="co">#  Number of Fisher Scoring iterations: 21</span></a>
-<a class="sourceLine" id="cb2-78" data-line-number="78"></a>
-<a class="sourceLine" id="cb2-79" data-line-number="79">data<span class="op">$</span>pred &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/predict">predict</a></span>(model, <span class="dt">newdata =</span> data, <span class="dt">type =</span> <span class="st">"response"</span>)</a>
-<a class="sourceLine" id="cb2-80" data-line-number="80"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/table">table</a></span>(data<span class="op">$</span>Species, data<span class="op">$</span>pred<span class="op">&gt;</span><span class="fl">0.5</span>)</a>
-<a class="sourceLine" id="cb2-81" data-line-number="81"> <span class="co">#              </span></a>
-<a class="sourceLine" id="cb2-82" data-line-number="82"> <span class="co">#               FALSE TRUE</span></a>
-<a class="sourceLine" id="cb2-83" data-line-number="83"> <span class="co">#    setosa        50    0</span></a>
-<a class="sourceLine" id="cb2-84" data-line-number="84"> <span class="co">#    versicolor     3   47</span></a>
-<a class="sourceLine" id="cb2-85" data-line-number="85"> <span class="co">#    virginica     49    1</span></a></code></pre></div>
+<a class="sourceLine" id="cb2-48" data-line-number="48">model &lt;-<span class="st"> </span>glmnet<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/glmnet/topics/cv.glmnet">cv.glmnet</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/matrix">as.matrix</a></span>(data[, newvars, <span class="dt">drop =</span> <span class="ot">FALSE</span>]), </a>
+<a class="sourceLine" id="cb2-49" data-line-number="49">                           <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/numeric">as.numeric</a></span>(data[[dep_var]]<span class="op">==</span>dep_target), </a>
+<a class="sourceLine" id="cb2-50" data-line-number="50">                           <span class="dt">family =</span> <span class="st">"binomial"</span>)</a>
+<a class="sourceLine" id="cb2-51" data-line-number="51"><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/coef">coef</a></span>(model, <span class="dt">lambda =</span> <span class="st">"lambda.min"</span>)</a>
+<a class="sourceLine" id="cb2-52" data-line-number="52"> <span class="co">#  7 x 1 sparse Matrix of class "dgCMatrix"</span></a>
+<a class="sourceLine" id="cb2-53" data-line-number="53"> <span class="co">#                        1</span></a>
+<a class="sourceLine" id="cb2-54" data-line-number="54"> <span class="co">#  (Intercept)   1.5870728</span></a>
+<a class="sourceLine" id="cb2-55" data-line-number="55"> <span class="co">#  Sepal.Length  0.9561804</span></a>
+<a class="sourceLine" id="cb2-56" data-line-number="56"> <span class="co">#  Petal.Length -2.5728208</span></a>
+<a class="sourceLine" id="cb2-57" data-line-number="57"> <span class="co">#  c_001         1.1092718</span></a>
+<a class="sourceLine" id="cb2-58" data-line-number="58"> <span class="co">#  c_002         1.0850882</span></a>
+<a class="sourceLine" id="cb2-59" data-line-number="59"> <span class="co">#  c_003         2.8079040</span></a>
+<a class="sourceLine" id="cb2-60" data-line-number="60"> <span class="co">#  c_004         8.8761731</span></a>
+<a class="sourceLine" id="cb2-61" data-line-number="61">data<span class="op">$</span>pred &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/numeric">as.numeric</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/predict">predict</a></span>(model, <span class="dt">newx =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/matrix">as.matrix</a></span>(data[, newvars, <span class="dt">drop =</span> <span class="ot">FALSE</span>]), <span class="dt">s =</span> <span class="st">"lambda.min"</span>))</a>
+<a class="sourceLine" id="cb2-62" data-line-number="62"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/table">table</a></span>(data<span class="op">$</span>Species, data<span class="op">$</span>pred<span class="op">&gt;</span><span class="fl">0.5</span>)</a>
+<a class="sourceLine" id="cb2-63" data-line-number="63"> <span class="co">#              </span></a>
+<a class="sourceLine" id="cb2-64" data-line-number="64"> <span class="co">#               FALSE TRUE</span></a>
+<a class="sourceLine" id="cb2-65" data-line-number="65"> <span class="co">#    setosa        50    0</span></a>
+<a class="sourceLine" id="cb2-66" data-line-number="66"> <span class="co">#    versicolor     4   46</span></a>
+<a class="sourceLine" id="cb2-67" data-line-number="67"> <span class="co">#    virginica     50    0</span></a></code></pre></div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">

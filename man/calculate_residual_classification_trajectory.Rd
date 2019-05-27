@@ -4,16 +4,14 @@
 \alias{calculate_residual_classification_trajectory}
 \title{Build residual classification trajectory.}
 \usage{
-calculate_residual_classification_trajectory(data, fit_predict, vars, ...,
-  dep_var, dep_target = TRUE,
-  cross_plan = vtreat::kWayStratifiedY(nrow(data), 3, data,
-  data[[dep_var]] == dep_target), fitter = xgboost_fit_predict_c,
+calculate_residual_classification_trajectory(data, vars, ..., dep_var,
+  dep_target = TRUE, cross_plan = vtreat::kWayStratifiedY(nrow(data),
+  3, data, data[[dep_var]] == dep_target),
+  fitter_c = xgboost_fit_predict_c, fitter_r = xgboost_fit_predict_r,
   cl = NULL)
 }
 \arguments{
 \item{data}{The data.frame of data to fit.}
-
-\item{fit_predict}{A function with signature fit_predict(train_data, vars, dep_var, dep_target, application_data) that returns a matrix with one row of predictions per row of appication_data, and an ordered set of columns of predictions.}
 
 \item{vars}{character vector, explanatory variable names.}
 
@@ -25,7 +23,9 @@ calculate_residual_classification_trajectory(data, fit_predict, vars, ...,
 
 \item{cross_plan}{a vtreat-style cross validation plan for data rows (list of disjoint tran/app lists where app partitions the data rows).}
 
-\item{fitter}{fit/predict signature function}
+\item{fitter_c}{fit/predict classification signature function}
+
+\item{fitter_r}{fit/predict regression signature function}
 
 \item{cl}{parallel cluster for processing}
 }
@@ -46,7 +46,6 @@ dep_target <- "versicolor"
 augments <- calculate_residual_classification_trajectory(
   data = data,
   vars = vars,
-  fit_predict = xgboost_fit_predict_c,
   dep_var = dep_var,
   dep_target = dep_target
 )

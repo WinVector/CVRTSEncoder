@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Build residual classification trajectory. — calculate_residual_classification_trajectory • CVRTSEncoder</title>
+<title>Adapt glmnet to a fit_predict() signature — glmnet_fit_predict_r • CVRTSEncoder</title>
 
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
@@ -30,10 +30,9 @@
 
 
 
-<meta property="og:title" content="Build residual classification trajectory. — calculate_residual_classification_trajectory" />
+<meta property="og:title" content="Adapt glmnet to a fit_predict() signature — glmnet_fit_predict_r" />
 
-<meta property="og:description" content="Build a cross-validated residual trajectory for a model.  The core idea is: other models factor the quantity to be explained into
-an explainable versus residual portion (with respect to the given model).  Each of these components are possibly useful for modeling." />
+<meta property="og:description" content="Adapt glmnet to a fit_predict() signature" />
 <meta name="twitter:card" content="summary" />
 
 
@@ -112,58 +111,42 @@ an explainable versus residual portion (with respect to the given model).  Each 
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Build residual classification trajectory.</h1>
-    <small class="dont-index">Source: <a href='https://github.com/WinVector/CVRTSEncoder/blob/master/R/get_classificaton_residuals.R'><code>R/get_classificaton_residuals.R</code></a></small>
-    <div class="hidden name"><code>calculate_residual_classification_trajectory.Rd</code></div>
+    <h1>Adapt glmnet to a fit_predict() signature</h1>
+    <small class="dont-index">Source: <a href='https://github.com/WinVector/CVRTSEncoder/blob/master/R/glmnet_fit_predict_r.R'><code>R/glmnet_fit_predict_r.R</code></a></small>
+    <div class="hidden name"><code>glmnet_fit_predict_r.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Build a cross-validated residual trajectory for a model.  The core idea is: other models factor the quantity to be explained into
-an explainable versus residual portion (with respect to the given model).  Each of these components are possibly useful for modeling.</p>
+    <p>Adapt glmnet to a fit_predict() signature</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>calculate_residual_classification_trajectory</span>(<span class='no'>data</span>, <span class='no'>vars</span>, <span class='no'>...</span>, <span class='no'>dep_var</span>,
-  <span class='kw'>dep_target</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>, <span class='kw'>cross_plan</span> <span class='kw'>=</span> <span class='kw pkg'>vtreat</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/vtreat/topics/kWayStratifiedY'>kWayStratifiedY</a></span>(<span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>nrow</a></span>(<span class='no'>data</span>),
-  <span class='fl'>3</span>, <span class='no'>data</span>, <span class='no'>data</span><span class='kw'>[[</span><span class='no'>dep_var</span>]] <span class='kw'>==</span> <span class='no'>dep_target</span>),
-  <span class='kw'>fitter_c</span> <span class='kw'>=</span> <span class='no'>xgboost_fit_predict_c</span>, <span class='kw'>fitter_r</span> <span class='kw'>=</span> <span class='no'>xgboost_fit_predict_r</span>,
+    <pre class="usage"><span class='fu'>glmnet_fit_predict_r</span>(<span class='no'>train_data</span>, <span class='no'>vars</span>, <span class='no'>dep_var</span>, <span class='no'>application_data</span>, <span class='no'>...</span>,
   <span class='kw'>cl</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>data</th>
-      <td><p>The data.frame of data to fit.</p></td>
+      <th>train_data</th>
+      <td><p>data.frame training data.</p></td>
     </tr>
     <tr>
       <th>vars</th>
       <td><p>character vector, explanatory variable names.</p></td>
     </tr>
     <tr>
-      <th>...</th>
-      <td><p>not used, force arguments to be bound by name</p></td>
-    </tr>
-    <tr>
       <th>dep_var</th>
       <td><p>character, the name of dependent variable.</p></td>
     </tr>
     <tr>
-      <th>dep_target</th>
-      <td><p>scalar, the value considered to be the target category of dep_var.</p></td>
+      <th>application_data</th>
+      <td><p>data.frame application data</p></td>
     </tr>
     <tr>
-      <th>cross_plan</th>
-      <td><p>a vtreat-style cross validation plan for data rows (list of disjoint tran/app lists where app partitions the data rows).</p></td>
-    </tr>
-    <tr>
-      <th>fitter_c</th>
-      <td><p>fit/predict classification signature function</p></td>
-    </tr>
-    <tr>
-      <th>fitter_r</th>
-      <td><p>fit/predict regression signature function</p></td>
+      <th>...</th>
+      <td><p>not used, force arguments to be bound by name</p></td>
     </tr>
     <tr>
       <th>cl</th>
@@ -173,22 +156,28 @@ an explainable versus residual portion (with respect to the given model).  Each 
     
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>a matrix with the same number of rows as data representing the cross-validated modeling residual trajectories.</p>
+    <p>a vector with the same number of rows as data representing the model predictions</p>
     
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
 <span class='no'>data</span> <span class='kw'>&lt;-</span> <span class='no'>iris</span>
-<span class='no'>vars</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"Sepal.Length"</span>, <span class='st'>"Petal.Length"</span>,
-          <span class='st'>"Sepal.Width"</span>, <span class='st'>"Petal.Width"</span>)
-<span class='no'>dep_var</span> <span class='kw'>&lt;-</span> <span class='st'>"Species"</span>
-<span class='no'>dep_target</span> <span class='kw'>&lt;-</span> <span class='st'>"versicolor"</span>
-<span class='no'>augments</span> <span class='kw'>&lt;-</span> <span class='fu'>calculate_residual_classification_trajectory</span>(
-  <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>data</span>,
+<span class='no'>vars</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"Sepal.Length"</span>, <span class='st'>"Sepal.Width"</span>,
+          <span class='st'>"Petal.Length"</span>, <span class='st'>"Petal.Width"</span>)
+<span class='no'>data</span>$<span class='no'>tvalue</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/numeric'>as.numeric</a></span>(<span class='no'>data</span>$<span class='no'>Species</span><span class='kw'>==</span><span class='st'>"versicolor"</span>)
+<span class='no'>dep_var</span> <span class='kw'>&lt;-</span> <span class='st'>"tvalue"</span>
+<span class='no'>xval</span> <span class='kw'>&lt;-</span> <span class='kw pkg'>vtreat</span><span class='kw ns'>::</span><span class='fu'><a href='https://www.rdocumentation.org/packages/vtreat/topics/kWayStratifiedY'>kWayStratifiedY</a></span>(
+  <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/nrow'>nrow</a></span>(<span class='no'>data</span>),
+  <span class='fl'>3</span>,
+  <span class='no'>data</span>,
+  <span class='no'>data</span><span class='kw'>[[</span><span class='no'>dep_var</span>]])
+<span class='no'>train_data</span> <span class='kw'>&lt;-</span> <span class='no'>data</span>[<span class='no'>xval</span><span class='kw'>[[</span><span class='fl'>1</span>]]$<span class='no'>train</span>, , <span class='kw'>drop</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>]
+<span class='no'>application_data</span> <span class='kw'>&lt;-</span> <span class='no'>data</span>[<span class='no'>xval</span><span class='kw'>[[</span><span class='fl'>1</span>]]$<span class='no'>app</span>, , <span class='kw'>drop</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>]
+<span class='no'>preds</span> <span class='kw'>&lt;-</span> <span class='fu'>glmnet_fit_predict_r</span>(
+  <span class='kw'>train_data</span> <span class='kw'>=</span> <span class='no'>train_data</span>,
   <span class='kw'>vars</span> <span class='kw'>=</span> <span class='no'>vars</span>,
   <span class='kw'>dep_var</span> <span class='kw'>=</span> <span class='no'>dep_var</span>,
-  <span class='kw'>dep_target</span> <span class='kw'>=</span> <span class='no'>dep_target</span>
-)</div></pre>
+  <span class='kw'>application_data</span> <span class='kw'>=</span> <span class='no'>application_data</span>)</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
     <h2>Contents</h2>

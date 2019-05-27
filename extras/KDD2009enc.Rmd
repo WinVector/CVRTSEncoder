@@ -179,7 +179,6 @@ cross_enc <- estimate_residual_encoding_c(
   data = dTrain,
   avars = numeric_cols,
   evars = categorical_cols,
-  fit_predict = xgboost_fit_predict_c,
   dep_var = yName,
   dep_target = yTarget,
   n_comp = 20,

@@ -5,7 +5,8 @@
 \title{Build residual class classification trajectory.}
 \usage{
 estimate_residual_encoding_c(data, ...,
-  fit_predict = xgboost_fit_predict_c, evars, avars, dep_var,
+  fit_predict_c = xgboost_fit_predict_c,
+  fit_predict_r = xgboost_fit_predict_r, evars, avars, dep_var,
   dep_target = TRUE, cross_plan = vtreat::kWayStratifiedY(nrow(data),
   3, data, data[[dep_var]] == dep_target), n_comp = 20, cl = NULL)
 }
@@ -14,7 +15,9 @@ estimate_residual_encoding_c(data, ...,
 
 \item{...}{not used, force arguments to be bound by name}
 
-\item{fit_predict}{A function with signature fit_predict(train_data, vars, dep_var, dep_target, application_data) that returns a matrix with one row of predictions per row of appication_data, and an ordered set of columns of predictions.}
+\item{fit_predict_c}{A function with signature fit_predict_c(train_data, vars, dep_var, dep_target, application_data) that returns a matrix with one row of predictions per row of appication_data, and an ordered set of columns of predictions.}
+
+\item{fit_predict_r}{A function with signature fit_predict_r(train_data, vars, dep_var, application_data) that returns a matrix with one row of predictions per row of appication_data, and an ordered set of columns of predictions.}
 
 \item{evars}{character vector, categorical explanatory variable names to be encoded.}
 
@@ -50,7 +53,6 @@ cross_enc <- estimate_residual_encoding_c(
   data = data,
   avars = avars,
   evars = evars,
-  fit_predict = xgboost_fit_predict_c,
   dep_var = dep_var,
   dep_target = dep_target,
   n_comp = 4
@@ -59,8 +61,9 @@ enc <- prepare(cross_enc$coder, data)
 data <- cbind(data, enc)
 newvars <- c(avars, colnames(enc))
 f <- wrapr::mk_formula(dep_var, newvars, outcome_target = dep_target)
-model <- glm(f, data = data, family = binomial)
-data$pred <- predict(model, newdata = data, type = "response")
+model <- glmnet::cv.glmnet(as.matrix(data[, newvars, drop = FALSE]), as.numeric(data[[dep_var]]==dep_target), family = "binomial")
+coef(model, lambda = "lambda.min")
+data$pred <- as.numeric(predict(model, newx = as.matrix(data[, newvars, drop = FALSE]), s = "lambda.min"))
 table(data$Species, data$pred>0.5)
 
 }

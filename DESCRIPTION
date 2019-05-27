@@ -2,7 +2,7 @@ Package: CVRTSEncoder
 Type: Package
 Title: Categorical Variable Residual Trajectory Specteral Encoder
 Version: 0.1.0
-Date: 2019-05-25
+Date: 2019-05-27
 Authors@R: c(
     person("John", "Mount", email = "jmount@win-vector.com", role = c("aut", "cre")),
     person("Nina", "Zumel", email = "nzumel@win-vector.com", role = c("aut")),

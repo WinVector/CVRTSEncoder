@@ -50,7 +50,6 @@ cross_enc <- estimate_residual_encoding_c(
   data = data,
   avars = avars,
   evars = evars,
-  fit_predict = xgboost_fit_predict_c,
   dep_var = dep_var,
   dep_target = dep_target,
   n_comp = 4
@@ -74,10 +73,11 @@ newvars <- c(avars, colnames(enc))
 f <- wrapr::mk_formula(dep_var, newvars, outcome_target = dep_target)
 print(f)
 
-model <- glm(f, data = data, family = binomial)
-summary(model)
-
-data$pred <- predict(model, newdata = data, type = "response")
+model <- glmnet::cv.glmnet(as.matrix(data[, newvars, drop = FALSE]), 
+                           as.numeric(data[[dep_var]]==dep_target), 
+                           family = "binomial")
+coef(model, lambda = "lambda.min")
+data$pred <- as.numeric(predict(model, newx = as.matrix(data[, newvars, drop = FALSE]), s = "lambda.min"))
 table(data$Species, data$pred>0.5)
 ```
 
