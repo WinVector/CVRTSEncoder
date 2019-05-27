@@ -177,11 +177,11 @@ numeric_cols <- vars[!is_cat_var]
 
 cross_enc <- estimate_residual_encoding_c(
   data = dTrain,
-  avars = numeric_cols,
+  avars = c(numeric_cols, categorical_cols),
   evars = categorical_cols,
   dep_var = yName,
   dep_target = yTarget,
-  n_comp = 20,
+  n_comp = 5,
   cl = cl
 )
 te_vars <- colnames(cross_enc$cross_frame)
@@ -199,8 +199,6 @@ date()
 date()
 
 # Run other models (with proper coding/training separation).
-#
-# This gets us back to AUC 0.74 range
 
 customCoders = list('c.PiecewiseV.num' = vtreat::solve_piecewise,
                     'n.PiecewiseV.num' = vtreat::solve_piecewise,
